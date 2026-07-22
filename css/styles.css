@@ -1,0 +1,531 @@
+/*
+ * ============================================================
+ * ESTILOS PERSONALIZADOS PARA MisTurnos
+ * ============================================================
+ * Usamos CSS custom properties (variables) para facilitar
+ * el modo oscuro/claro. Solo cambiamos las variables y
+ * todo el diseño se adapta automáticamente.
+ * ============================================================
+ */
+
+/* ===================== VARIABLES DEL TEMA CLARO ===================== */
+:root {
+    --primary: #4f46e5;          /* Azul-indigo principal */
+    --primary-hover: #4338ca;    /* Hover más oscuro */
+    --primary-light: #e0e7ff;    /* Fondo suave de acento */
+    --bg-body: #f8f9fa;          /* Fondo general de la página */
+    --bg-card: #ffffff;          /* Fondo de tarjetas */
+    --bg-sidebar: #ffffff;       /* Fondo del sidebar/header */
+    --text-primary: #1e293b;     /* Texto principal oscuro */
+    --text-secondary: #64748b;   /* Texto secundario/gris */
+    --border-color: #e2e8f0;     /* Bordes generales */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);  /* Sombra suave */
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);  /* Sombra media */
+    --radius-sm: 8px;            /* Bordes redondeados suaves */
+    --radius-md: 12px;           /* Bordes redondeados medios */
+    --transition: all 0.3s ease; /* Transiciones suaves */
+}
+
+/* ===================== VARIABLES DEL TEMA OSCURO ===================== */
+/*
+ * Cuando el html tiene data-bs-theme="dark", estas variables
+ * sobreescriben las del tema claro. Bootstrap 5.3 ya maneja
+ * sus propias variables oscuras, pero las nuestras personalizan
+ * la app.
+ */
+html[data-bs-theme="dark"] {
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --primary-light: #312e81;
+    --bg-body: #0f172a;
+    --bg-card: #1e293b;
+    --bg-sidebar: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* ===================== ESTILOS GLOBALES ===================== */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: var(--transition);
+    min-height: 100vh;
+}
+
+/*
+ * Sombras personalizadas para Bootstrap.
+ * Sobreescribimos las clases .shadow-sm y .shadow
+ * para que usen nuestras variables de sombra.
+ */
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* ===================== NAVBAR ===================== */
+.navbar {
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    letter-spacing: -0.5px;
+}
+
+/* ===================== PANTALLA DE LOGIN / AUTH ===================== */
+
+/*
+ * Contenedor que centra el formulario de login
+ * en cualquier tamaño de pantalla.
+ * Flexbox + min-height para que ocupe toda la pantalla.
+ */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+}
+
+/*
+ * La tarjeta del formulario de login.
+ * Tiene un max-width para que no se estire demasiado en pantallas grandes.
+ */
+.auth-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+/*
+ * Logo grande arriba del formulario
+ */
+.auth-logo {
+    font-size: 4rem;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.auth-title {
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+}
+
+/*
+ * Pestañas del formulario (Login / Registro)
+ * Sobreescribimos los pills de Bootstrap para que se vean más modernos.
+ */
+.auth-card .nav-pills .nav-link {
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    transition: var(--transition);
+}
+
+.auth-card .nav-pills .nav-link.active {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+/* ===================== TARJETAS DE ESTADÍSTICAS (DASHBOARD) ===================== */
+
+/*
+ * Tarjetas del dashboard que muestran números resumen.
+ * Se animan al pasar el mouse por encima.
+ */
+.stat-card {
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+/*
+ * Icono circular dentro de las tarjetas de stats
+ */
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ===================== TARJETAS GENERALES ===================== */
+.card {
+    border-radius: var(--radius-md);
+    background-color: var(--bg-card);
+    transition: var(--transition);
+}
+
+.card-header {
+    border-bottom-color: var(--border-color);
+}
+
+/* ===================== LISTA DE TURNOS ===================== */
+
+/*
+ * Cada turno en la lista es un item del list-group.
+ * Personalizamos el hover y los bordes.
+ */
+.list-group-item {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    transition: var(--transition);
+}
+
+.list-group-item:hover {
+    background-color: var(--primary-light);
+}
+
+/* ===================== TARJETAS DE PACIENTES ===================== */
+
+.patient-card {
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.patient-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.patient-card .card-body {
+    padding: 1.25rem;
+}
+
+/*
+ * Avatar del paciente (inicial del nombre)
+ */
+.patient-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* ===================== TARJETAS DE TURNOS ===================== */
+
+.appointment-item {
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.appointment-item:hover {
+    background-color: var(--primary-light);
+}
+
+/*
+ * Indicadores de color para cada estado del turno:
+ * - Programado: azul
+ * - Confirmado: verde
+ * * - Realizado: gris
+ * - Cancelado: rojo
+ */
+.appointment-item.status-scheduled {
+    border-left-color: #3b82f6;
+}
+
+.appointment-item.status-confirmed {
+    border-left-color: #22c55e;
+}
+
+.appointment-item.status-completed {
+    border-left-color: #94a3b8;
+}
+
+.appointment-item.status-cancelled {
+    border-left-color: #ef4444;
+    opacity: 0.6;
+}
+
+/* ===================== BADGES DE ESTADO ===================== */
+.badge-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35em 0.75em;
+    border-radius: 999px;
+}
+
+.badge-scheduled {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-confirmed {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.badge-completed {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.badge-cancelled {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/*
+ * Tema oscuro: los badges deben tener colores más claros
+ */
+html[data-bs-theme="dark"] .badge-scheduled {
+    background-color: #1e3a5f;
+    color: #93c5fd;
+}
+
+html[data-bs-theme="dark"] .badge-confirmed {
+    background-color: #14532d;
+    color: #86efac;
+}
+
+html[data-bs-theme="dark"] .badge-completed {
+    background-color: #334155;
+    color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .badge-cancelled {
+    background-color: #450a0a;
+    color: #fca5a5;
+}
+
+/* ===================== BOTÓN WHATSAPP ===================== */
+.btn-whatsapp {
+    background-color: #25d366;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.btn-whatsapp:hover {
+    background-color: #1da851;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* ===================== FOTO DE PERFIL ===================== */
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 4px solid var(--primary);
+    padding: 2px;
+}
+
+.profile-photo-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/*
+ * Overlay que aparece al pasar el mouse sobre la foto.
+ * Permite cambiar la foto haciendo click.
+ */
+.profile-photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.profile-photo-wrapper:hover .profile-photo-overlay {
+    opacity: 1;
+}
+
+/* ===================== FORMULARIOS ===================== */
+
+.form-control, .form-select {
+    border-radius: var(--radius-sm);
+    border-color: var(--border-color);
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.input-group-text {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+/* ===================== BOTONES ===================== */
+
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* ===================== TOAST (NOTIFICACIONES) ===================== */
+.toast {
+    border-radius: var(--radius-sm);
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+/* ===================== TRANSICIONES DE SECCIONES ===================== */
+
+/*
+ * Animación sutil cuando aparece una sección.
+ * Le da una sensación de "slide in" al navegar.
+ */
+.page-section {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+/*
+ * En pantallas muy chicas, ajustamos一些 tamaños.
+ */
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-logo {
+        font-size: 3rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .profile-photo {
+        width: 90px;
+        height: 90px;
+    }
+
+    .profile-photo-overlay {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+/* ===================== SCROLLBAR PERSONALIZADA ===================== */
+
+/*
+ * Hacemos que la barra de scroll se vea más prolija
+ * y se adapte al tema de la app.
+ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-body);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* ===================== WIZARD DE TURNO ===================== */
+
+.wizard-patient-item {
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+}
+
+.wizard-patient-item:hover {
+    border-color: var(--primary);
+}
+
+/* ===================== UTILIDADES ===================== */
+
+.text-primary-custom {
+    color: var(--primary) !important;
+}
+
+.bg-primary-custom {
+    background-color: var(--primary) !important;
+}
+
+/* Separador sutil */
+.divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 1rem 0;
+}
