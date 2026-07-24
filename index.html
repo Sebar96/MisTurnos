@@ -16,6 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Nuestros estilos custom -->
     <link href="css/styles.css" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="img/icon.svg">
     <!-- Manifest para PWA -->
     <link rel="manifest" href="manifest.json">
 </head>
@@ -532,11 +534,32 @@
          Bootstrap JS bundle (incluye Popper)
          ============================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYwf6g6YUuqWvBiqnNqd9vCYNKi6oFSyc",
+            authDomain: "misturnos-23c46.firebaseapp.com",
+            projectId: "misturnos-23c46",
+            storageBucket: "misturnos-23c46.firebasestorage.app",
+            messagingSenderId: "661063082957",
+            appId: "1:661063082957:web:aca7f6f70ae57c9947da84"
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        window.firebaseApp = firebaseApp;
+        window.firebaseAuth = getAuth(firebaseApp);
+        window.firebaseDB = getFirestore(firebaseApp);
+        window.firebaseExports = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot };
+    </script>
     <!-- Nuestros scripts (el orden importa) -->
-    <script src="js/app.js?v=2"></script>
-    <script src="js/auth.js?v=2"></script>
-    <script src="js/patients.js?v=2"></script>
-    <script src="js/appointments.js?v=2"></script>
-    <script src="js/profile.js?v=2"></script>
+    <script src="js/app.js?v=3"></script>
+    <script src="js/auth.js?v=3"></script>
+    <script src="js/patients.js?v=3"></script>
+    <script src="js/appointments.js?v=3"></script>
+    <script src="js/profile.js?v=3"></script>
 </body>
 </html>
