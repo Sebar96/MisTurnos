@@ -28,10 +28,41 @@ const App = {
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then((reg) => console.log('[App] Service Worker registrado:', reg.scope))
-                .catch((err) => console.warn('[App] Error al registrar SW:', err));
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                console.log('[App] Service Worker registrado:', reg.scope);
+
+                // Detectar actualizaciones
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    console.log('[App] Nueva versión encontrada...');
+
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Hay una nueva versión disponible
+                            this.showUpdateBanner();
+                        }
+                    });
+                });
+            }).catch((err) => console.warn('[App] Error al registrar SW:', err));
         }
+    },
+
+    showUpdateBanner() {
+        // Crear banner de actualización
+        const banner = document.createElement('div');
+        banner.id = 'updateBanner';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#4f46e5;color:white;padding:12px 20px;z-index:9999;display:flex;align-items:center;justify-content:space-between;';
+        banner.innerHTML = `
+            <span><i class="bi bi-arrow-up-circle me-2"></i>Nueva versión disponible</span>
+            <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:6px 16px;border-radius:6px;font-weight:600;cursor:pointer;">
+                Actualizar
+            </button>`;
+        document.body.appendChild(banner);
+    },
+
+    applyUpdate() {
+        // Recargar la página con la nueva versión
+        window.location.reload();
     },
 
     navigate(page) {
