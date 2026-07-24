@@ -99,32 +99,25 @@ const App = {
 
         document.getElementById('statToday').textContent = todayAppts.length;
         document.getElementById('statWeek').textContent = weekAppts.length;
-        document.getElementById('statPatients').textContent = patients.length;
         document.getElementById('statPending').textContent = pendingAppts.length;
 
         const container = document.getElementById('dashboardAppointments');
-        if (weekAppts.length === 0) {
+        if (todayAppts.length === 0) {
             container.innerHTML = `
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-calendar-check fs-1 d-block mb-2"></i>
-                    ¡No tenés turnos esta semana!
+                    ¡No tenés turnos hoy!
                 </div>`;
         } else {
-            weekAppts.sort((a, b) => {
-                const dateCompare = a.date.localeCompare(b.date);
-                if (dateCompare !== 0) return dateCompare;
-                return a.time.localeCompare(b.time);
-            });
-            container.innerHTML = weekAppts.map((appt) => {
+            todayAppts.sort((a, b) => a.time.localeCompare(b.time));
+            container.innerHTML = todayAppts.map((appt) => {
                 const patient = patients.find((p) => p.id === appt.patientId);
                 const patientName = patient ? patient.name : 'Paciente eliminado';
-                const isToday = appt.date === todayStr;
-                const dayLabel = isToday ? 'Hoy' : this.formatDateShort(appt.date);
                 return `
                     <div class="list-group-item appointment-item status-${appt.status}">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="badge ${isToday ? 'bg-primary' : 'bg-secondary'}">${dayLabel}</span>
+                                <span class="badge bg-primary">Hoy</span>
                                 <span class="fw-bold ms-1">${appt.time}</span>
                                 <span class="ms-2">${patientName}</span>
                             </div>

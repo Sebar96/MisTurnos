@@ -88,8 +88,8 @@ const Appointments = {
                             </span>
                             <div class="d-flex gap-1 flex-wrap justify-content-end">
                                 ${patientPhone ? `
-                                    <button class="btn-whatsapp" style="width:32px;height:32px;font-size:0.9rem"
-                                            title="WhatsApp" onclick="App.openWhatsApp('${patientPhone}', 'Hola, le escribimos desde MisTurnos sobre su turno del ${App.formatDateHuman(appt.date)} a las ${appt.time}.')">
+                                    <button class="btn btn-outline-success btn-sm" title="Mensajes WhatsApp"
+                                            onclick="Messages.showModal('${appt.id}')">
                                         <i class="bi bi-whatsapp"></i>
                                     </button>
                                 ` : ''}

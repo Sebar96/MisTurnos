@@ -186,6 +186,38 @@ const Patients = {
                         <label class="form-label">Motivo de consulta / Descripción</label>
                         <textarea class="form-control" id="pReason" rows="3" placeholder="Breve descripción del motivo de consulta..."></textarea>
                     </div>
+
+                    <!-- Datos médicos -->
+                    <div class="col-12">
+                        <h6 class="fw-bold text-muted mt-3"><i class="bi bi-heart-pulse me-2"></i>Datos Médicos</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cardiopatía</label>
+                        <select class="form-select" id="pCardiac">
+                            <option value="no">No</option>
+                            <option value="si">Sí</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Detalle cardiopatía</label>
+                        <input type="text" class="form-control" id="pCardiacDetail" placeholder="Ej: Arritmia, insuficiencia...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Enfermedades</label>
+                        <textarea class="form-control" id="pDiseases" rows="2" placeholder="Ej: Diabetes tipo 2, hipertensión..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Alergias</label>
+                        <textarea class="form-control" id="pAllergies" rows="2" placeholder="Ej: Penicilina, látex..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Medicación actual</label>
+                        <textarea class="form-control" id="pMedication" rows="2" placeholder="Ej: Losartán 50mg, Aspirina..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="pObservations" rows="2" placeholder="Otras observaciones relevantes..."></textarea>
+                    </div>
                 </div>
             </form>`;
 
@@ -207,6 +239,12 @@ const Patients = {
                     document.getElementById('pInsurance').value = p.insurance || '';
                     document.getElementById('pStatus').value = p.status || 'active';
                     document.getElementById('pReason').value = p.reason || '';
+                    document.getElementById('pCardiac').value = p.cardiac || 'no';
+                    document.getElementById('pCardiacDetail').value = p.cardiacDetail || '';
+                    document.getElementById('pDiseases').value = p.diseases || '';
+                    document.getElementById('pAllergies').value = p.allergies || '';
+                    document.getElementById('pMedication').value = p.medication || '';
+                    document.getElementById('pObservations').value = p.observations || '';
                 }
             });
         }
@@ -225,7 +263,13 @@ const Patients = {
             email: document.getElementById('pEmail').value.trim(),
             insurance: document.getElementById('pInsurance').value.trim(),
             status: document.getElementById('pStatus').value,
-            reason: document.getElementById('pReason').value.trim()
+            reason: document.getElementById('pReason').value.trim(),
+            cardiac: document.getElementById('pCardiac').value,
+            cardiacDetail: document.getElementById('pCardiacDetail').value.trim(),
+            diseases: document.getElementById('pDiseases').value.trim(),
+            allergies: document.getElementById('pAllergies').value.trim(),
+            medication: document.getElementById('pMedication').value.trim(),
+            observations: document.getElementById('pObservations').value.trim()
         };
 
         if (!data.name || !data.phone) {
