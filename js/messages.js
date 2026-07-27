@@ -10,7 +10,7 @@ const Messages = {
             icon: 'bi-check-circle',
             color: 'success',
             template: (patientName, date, time, professionalName) =>
-                `Hola ${patientName}, le confirmamos su turno del ${App.formatDateHuman(date)} a las ${time} con ${professionalName}.\n\nPor favor, confirme su asistencia.\n\n¡Lo esperamos!`
+                `Hola ${patientName}, le confirmamos que su turno del ${App.formatDateHuman(date)} a las ${time} con ${professionalName} está confirmado.\n\n¡Lo esperamos!`
         },
         reschedule: {
             label: 'Reprogramar turno',

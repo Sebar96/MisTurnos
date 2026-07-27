@@ -62,10 +62,10 @@ const Appointments = {
             const isPast = apptDate < new Date();
             const isToday = appt.date === App.formatDate(new Date());
 
-            const canCancel = (appt.status === 'scheduled' || appt.status === 'confirmed') && !isPast;
+            const canOperate = appt.status === 'scheduled' || appt.status === 'confirmed';
 
             return `
-                <div class="list-group-item appointment-item status-${appt.status} ${isPast && appt.status !== 'cancelled' ? 'opacity-75' : ''}">
+                <div class="list-group-item appointment-item status-${appt.status}">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
@@ -105,7 +105,7 @@ const Appointments = {
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 ` : ''}
-                                ${canCancel ? `
+                                ${canOperate ? `
                                     <button class="btn btn-outline-warning btn-sm" title="Reprogramar"
                                             onclick="Appointments.showModal('${appt.id}', null, true)">
                                         <i class="bi bi-arrow-repeat"></i>
@@ -115,7 +115,7 @@ const Appointments = {
                                         onclick="Appointments.showModal('${appt.id}')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                ${canCancel ? `
+                                ${canOperate ? `
                                     <button class="btn btn-outline-danger btn-sm" title="Cancelar"
                                             onclick="Appointments.cancel('${appt.id}')">
                                         <i class="bi bi-x-lg"></i>

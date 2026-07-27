@@ -125,7 +125,8 @@ const App = {
         });
 
         const pendingAppts = appointments.filter((a) => {
-            return (a.status === 'scheduled' || a.status === 'confirmed');
+            const apptDate = new Date(a.date + 'T' + a.time);
+            return (a.status === 'scheduled' || a.status === 'confirmed') && apptDate >= new Date();
         });
 
         document.getElementById('statToday').textContent = todayAppts.length;
