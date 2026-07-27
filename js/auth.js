@@ -52,11 +52,22 @@ const Auth = {
         return this._currentFirebaseUser ? this._currentFirebaseUser.uid : null;
     },
 
+    isAdmin() {
+        return this._currentFirebaseUser && this._currentFirebaseUser.email === 'sebarruso96@gmail.com';
+    },
+
     showApp(user) {
         document.getElementById('page-login').classList.add('d-none');
         document.getElementById('navbar').classList.remove('d-none');
         document.getElementById('navUserName').textContent = user.name || user.email || 'Usuario';
-        App.navigate('dashboard');
+
+        if (this.isAdmin()) {
+            document.getElementById('navAdminItem').style.display = '';
+            App.navigate('admin');
+        } else {
+            document.getElementById('navAdminItem').style.display = 'none';
+            App.navigate('dashboard');
+        }
     },
 
     showLogin() {

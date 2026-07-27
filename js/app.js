@@ -95,6 +95,9 @@ const App = {
             case 'profile':
                 Profile.load();
                 break;
+            case 'admin':
+                Admin.loadDashboard();
+                break;
         }
 
         const navCollapse = document.getElementById('navContent');
