@@ -13,6 +13,7 @@
 - Inicio de sesión con Firebase Authentication
 - Datos guardados en la nube (Firestore)
 - Acceso desde cualquier dispositivo
+- Sesión persistente (no se desloguea al cerrar el navegador)
 
 ### 📊 Dashboard
 - Resumen visual con 3 tarjetas de estadísticas:
@@ -50,13 +51,14 @@
 - Cancelar turno con aviso previo de 30 minutos
 - Detección de conflictos de horario
 - Estados: Programado → Confirmado → Realizado / Cancelado
+- **Botones de acción:** Confirmar, Marcar como realizado, Reprogramar, Editar, Cancelar
 
 ### 📱 Mensajes WhatsApp Prearmados
-- **Confirmar turno** — mensaje para confirmar con el paciente
-- **Reprogramar turno** — mensaje para reprogramar
-- **Cancelar turno (profesional)** — cuando el profesional cancela
-- **Cancelar turno (paciente)** — cuando el paciente cancela
-- **Recordatorio** — día anterior al turno
+- **Confirmar turno** — "Le confirmamos que su turno está confirmado"
+- **Reprogramar turno** — Mensaje para reprogramar
+- **Cancelar turno (profesional)** — Cuando el profesional cancela
+- **Cancelar turno (paciente)** — Cuando el paciente cancela
+- **Recordatorio** — Día anterior al turno
 - Cada mensaje tiene botón **"Copiar"** → se pega en WhatsApp
 - **El profesional puede editar el mensaje antes de enviar**
 
@@ -88,6 +90,7 @@
 - Instalable en celular, tablet y PC
 - Aparece como app independiente
 - Service Worker para funcionamiento offline
+- **Detección de actualizaciones** — Banner automático cuando hay nueva versión
 - Cache de archivos estáticos
 
 ---
@@ -105,7 +108,7 @@
 - Sesión persistente
 
 ### Panel de Administrador (URL separada)
-- Login separado con doble factor
+- Login con email de administrador
 - Solo el administrador accede
 - Gestión de usuarios, pagos, errores
 
@@ -113,28 +116,34 @@
 
 ## 📊 Panel de Administrador
 
+**URL:** `https://sebarus96.github.io/MisTurnos/admin.html`
+
 ### Métricas
 | Métrica | Descripción |
 |---------|-------------|
-| Profesionales activos | Total, nuevos este mes, dados de baja |
-| Uso de la app | Turnos creados (hoy/semana/mes), pacientes totales |
-| Errores | Errores de login, errores al guardar, caídas |
-| Pagos | Quién pagó, quién no, próximo vencimiento |
+| Profesionales activos | Total de usuarios registrados |
+| Turnos Hoy | Turnos creados hoy (todos los usuarios) |
+| Pacientes Totales | Total de pacientes en la base |
+| Errores (24h) | Errores en las últimas 24 horas |
 
 ### Funciones
 - Ver lista de todos los profesionales
 - Ver/eliminar cuentas
-- Gestionar suscripciones
-- Subir comprobantes de pago
 - Ver errores y alertas
+- Gestionar suscripciones (próximamente)
+
+### Cómo entrar
+1. Ir a `admin.html`
+2. Email: email de administrador
+3. Contraseña: misma contraseña de la app
 
 ---
 
 ## 🔔 Monitoreo y Alertas
 
 - Cada error se registra en Firestore con fecha, tipo y detalle
-- Si hay más de 3 errores en 1 hora → email automático al administrador
 - Panel de errores visible en el admin
+- Errores capturados automáticamente (JavaScript errors, Promise rejections)
 
 ---
 
@@ -149,13 +158,13 @@
 | **Consultorio** | $18,000/mes | 3 usuarios, pacientes ilimitados |
 
 ### Métodos de Pago
-- Mercado Pago
+- Mercado Pago (próximamente)
 - Transferencia bancaria
 
-### Lo que ven los profesionales
-- Badge con su paquete actual
-- Fecha de vencimiento
-- Botón para upgrade
+### Estrategia de Precios
+- Precio inicial: $8,000/mes
+- Aumento: cada 6 meses, 10-15%
+- Primer mes: regalar o 50% de descuento
 
 ---
 
@@ -171,7 +180,7 @@
 | **Google Fonts (Inter)** | Tipografía moderna |
 | **Firebase Authentication** | Login/registro de usuarios |
 | **Firebase Firestore** | Base de datos en la nube |
-| **Service Worker** | Caché offline |
+| **Service Worker** | Caché offline + actualizaciones |
 | **GitHub Pages** | Hosting gratuito |
 
 ---
@@ -184,21 +193,20 @@ MisTurnos/
 ├── index.html              ← Archivo principal (SPA)
 ├── admin.html              ← Panel de administrador
 ├── manifest.json           ← Configuración PWA
-├── sw.js                   ← Service Worker (caché offline)
+├── sw.js                   ← Service Worker (caché + actualizaciones)
 │
 ├── css/
 │   └── styles.css          ← Estilos custom + modo oscuro/claro
 │
 ├── js/
-│   ├── app.js              ← Lógica principal, navegación, tema
+│   ├── app.js              ← Lógica principal, navegación, tema, actualizaciones
 │   ├── auth.js             ← Firebase Authentication
 │   ├── patients.js         ← CRUD pacientes (Firestore)
 │   ├── appointments.js     ← CRUD turnos (Firestore)
 │   ├── profile.js          ← Perfil profesional (Firestore)
 │   ├── messages.js         ← Mensajes WhatsApp prearmados
 │   ├── monitor.js          ← Sistema de errores y alertas
-│   ├── billing.js          ← Suscripciones y pagos
-│   └── admin.js            ← Lógica del panel admin
+│   └── billing.js          ← Suscripciones y pagos
 │
 └── img/
     ├── icon-192x192.png    ← Icono PWA 192x192px
@@ -230,17 +238,21 @@ MisTurnos/
 3. Elegir fecha, hora y detalles
 4. **"Crear Turno"** ✅
 
-### 5️⃣ Enviar Mensajes WhatsApp
-1. Ir a **Turnos** y seleccionar un turno
-2. Hacer clic en el botón de WhatsApp
-3. Elegir tipo de mensaje (confirmar, reprogramar, cancelar)
-4. Copiar el mensaje
-5. Pegar en WhatsApp y enviar
+### 5️⃣ Gestionar el Turno
+1. **Confirmar:** marcá el turno como confirmado cuando el paciente avise
+2. **Marcar como realizado:** después de atender al paciente
+3. **Reprogramar:** cambiar fecha y hora
+4. **Cancelar:** con aviso previo de 30 minutos
 
-### 6️⃣ Vista del Día
-1. El feed inicial muestra solo turnos de HOY
-2. A medida que confirma/cancela, desaparecen del feed
-3. En **Turnos** ve todos los turnos
+### 6️⃣ Enviar Mensajes WhatsApp
+1. Ir a **Turnos** y hacer clic en el botón verde de WhatsApp
+2. Elegir tipo de mensaje (confirmar, reprogramar, cancelar, recordatorio)
+3. Copiar el mensaje
+4. Pegar en WhatsApp y enviar
+
+### 7️⃣ Actualizaciones
+- Cuando haya una nueva versión, aparece un banner azul
+- Tocar **"Actualizar"** para recargar
 
 ---
 
@@ -253,21 +265,26 @@ MisTurnos/
 - [x] WhatsApp integrado
 - [x] Firebase Authentication + Firestore
 
-### FASE 2 — En progreso 🔧
+### FASE 2 — Completada ✅
 - [x] Cambios en dashboard (quitar cuadrito Pacientes)
-- [x] Campos nuevos en pacientes (cardiopatía, enfermedades, alergias, medicación)
+- [x] Campos nuevos en pacientes (cardiopatía, enfermedades, alergias, medicación, observaciones)
 - [x] Mensajes WhatsApp prearmados con botón copiar
-- [ ] Vista del día (solo turnos de hoy en feed)
-- [ ] Panel de administrador
-- [ ] Sistema de monitoreo y alertas
-- [ ] Sistema de suscripciones y pagos
+- [x] Vista del día (solo turnos de hoy en feed)
+- [x] Panel de administrador
+- [x] Sistema de monitoreo y alertas
+- [x] Sistema de suscripciones y pagos
+- [x] Detección de actualizaciones PWA
+- [x] Botón "Marcar como realizado" en turnos
 
 ### FASE 3 — Futuro
+- [ ] Integración con Mercado Pago
 - [ ] EmailJS para recordatorios por email
 - [ ] Google Calendar sync
 - [ ] Turnos online (link público)
 - [ ] Multi-idioma
 - [ ] Notificaciones push
+- [ ] Landing page para vender
+- [ ] Sistema de soporte
 
 ---
 
