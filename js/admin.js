@@ -78,7 +78,7 @@ const Admin = {
                     <div class="list-group-item">
                         <small class="text-danger fw-bold">${err.type || 'Error'}</small>
                         <p class="mb-0 small text-muted">${err.message || ''}</p>
-                        <small class="text-muted">${err.userEmail || ''} · ${err.timestamp && err.timestamp.toDate ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : ''}</small>
+                        <small class="text-muted">${err.userEmail || ''} · ${err.timestamp ? (typeof err.timestamp === 'string' ? new Date(err.timestamp).toLocaleString('es-AR') : (err.timestamp.toDate ? err.timestamp.toDate().toLocaleString('es-AR') : '')) : ''}</small>
                     </div>
                 `).join('');
             }
@@ -150,7 +150,7 @@ const Admin = {
     },
 
     async loadErrors() {
-        const { collection, getDocs, query, orderBy, limit } = window.firebaseExports;
+        const { collection, getDocs } = window.firebaseExports;
         const db = window.firebaseDB;
 
         try {
@@ -162,32 +162,71 @@ const Admin = {
                 return;
             }
 
+            const errors = errorsSnapshot.docs.map((d) => {
+                const err = d.data();
+                let dateStr = 'N/A';
+                if (err.timestamp) {
+                    const date = typeof err.timestamp === 'string' ? new Date(err.timestamp) : (err.timestamp.toDate ? err.timestamp.toDate() : new Date(err.timestamp));
+                    dateStr = date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                }
+                return { ...err, dateStr };
+            }).sort((a, b) => {
+                const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
+                const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+                return dateB - dateA;
+            });
+
             container.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">${errors.length} errores registrados</span>
+                    <button class="btn btn-outline-danger btn-sm" onclick="Admin.clearErrors()">
+                        <i class="bi bi-trash me-1"></i>Limpiar todo
+                    </button>
+                </div>
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Fecha</th>
+                            <th>Fecha y Hora</th>
                             <th>Tipo</th>
                             <th>Mensaje</th>
                             <th>Usuario</th>
+                            <th>URL</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${errorsSnapshot.docs.map((d) => {
-                            const err = d.data();
-                            const date = err.timestamp && err.timestamp.toDate ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : 'N/A';
-                            return `
-                                <tr>
-                                    <td>${date}</td>
-                                    <td><span class="badge bg-danger">${err.type || 'Error'}</span></td>
-                                    <td>${err.message || ''}</td>
-                                    <td>${err.userEmail || 'N/A'}</td>
-                                </tr>`;
-                        }).join('')}
+                        ${errors.map((err) => `
+                            <tr>
+                                <td><small>${err.dateStr}</small></td>
+                                <td><span class="badge bg-danger">${err.type || 'Error'}</span></td>
+                                <td><small>${err.message || ''}</small></td>
+                                <td><small>${err.userEmail || 'N/A'}</small></td>
+                                <td><small class="text-muted text-truncate" style="max-width:150px;display:block;">${err.url || ''}</small></td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>`;
         } catch (err) {
             console.error('[Admin] Load errors error:', err);
+            document.getElementById('adminErrorsList').innerHTML = '<div class="text-center text-muted py-4">No hay errores registrados</div>';
+        }
+    },
+
+    async clearErrors() {
+        if (!confirm('¿Eliminar todos los errores registrados?')) return;
+
+        const { collection, getDocs, doc, deleteDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        try {
+            const snapshot = await getDocs(collection(db, 'errors'));
+            const deletes = snapshot.docs.map((d) => deleteDoc(doc(db, 'errors', d.id)));
+            await Promise.all(deletes);
+            App.showToast('Errores eliminados', 'success');
+            this.loadErrors();
+            this.loadDashboard();
+        } catch (err) {
+            console.error('[Admin] Clear errors error:', err);
+            App.showToast('Error al limpiar errores', 'danger');
         }
     },
 
