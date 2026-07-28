@@ -154,11 +154,7 @@ const Admin = {
         const db = window.firebaseDB;
 
         try {
-            const errorsSnapshot = await getDocs(query(
-                collection(db, 'errors'),
-                orderBy('timestamp', 'desc'),
-                limit(50)
-            ));
+            const errorsSnapshot = await getDocs(collection(db, 'errors'));
 
             const container = document.getElementById('adminErrorsList');
             if (errorsSnapshot.empty) {
@@ -179,9 +175,10 @@ const Admin = {
                     <tbody>
                         ${errorsSnapshot.docs.map((d) => {
                             const err = d.data();
+                            const date = err.timestamp && err.timestamp.toDate ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : 'N/A';
                             return `
                                 <tr>
-                                    <td>${err.timestamp ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : 'N/A'}</td>
+                                    <td>${date}</td>
                                     <td><span class="badge bg-danger">${err.type || 'Error'}</span></td>
                                     <td>${err.message || ''}</td>
                                     <td>${err.userEmail || 'N/A'}</td>
