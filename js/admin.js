@@ -1,7 +1,7 @@
 const Admin = {
 
     async loadDashboard() {
-        const { collection, getDocs, query, orderBy, limit } = window.firebaseExports;
+        const { collection, getDocs } = window.firebaseExports;
         const db = window.firebaseDB;
 
         document.getElementById('adminDate').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -35,17 +35,16 @@ const Admin = {
             document.getElementById('statTodayAppts').textContent = totalTodayAppts;
             document.getElementById('statTotalPatients').textContent = totalPatients;
 
-            const errorsSnapshot = await getDocs(query(
-                collection(db, 'errors'),
-                orderBy('timestamp', 'desc'),
-                limit(100)
-            ));
-            const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            const recentErrors = errorsSnapshot.docs.filter((d) => {
-                const data = d.data();
-                return data.timestamp && data.timestamp.toDate() > yesterday;
-            });
-            document.getElementById('statErrors24h').textContent = recentErrors.length;
+            let recentErrors = [];
+            try {
+                const errorsSnapshot = await getDocs(collection(db, 'errors'));
+                recentErrors = errorsSnapshot.docs.slice(0, 10).map((d) => ({ id: d.id, ...d.data() }));
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const errors24h = recentErrors.filter((e) => e.timestamp && e.timestamp.toDate && e.timestamp.toDate() > yesterday);
+                document.getElementById('statErrors24h').textContent = errors24h.length;
+            } catch (e) {
+                document.getElementById('statErrors24h').textContent = '0';
+            }
 
             const recentUsers = users.sort((a, b) => {
                 const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
@@ -75,15 +74,13 @@ const Admin = {
             if (recentErrors.length === 0) {
                 recentErrorsList.innerHTML = '<div class="text-center text-muted py-4">No hay errores</div>';
             } else {
-                recentErrorsList.innerHTML = recentErrors.slice(0, 5).map((d) => {
-                    const err = d.data();
-                    return `
-                        <div class="list-group-item">
-                            <small class="text-danger fw-bold">${err.type || 'Error'}</small>
-                            <p class="mb-0 small text-muted">${err.message || ''}</p>
-                            <small class="text-muted">${err.userEmail || ''} · ${err.timestamp ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : ''}</small>
-                        </div>`;
-                }).join('');
+                recentErrorsList.innerHTML = recentErrors.map((err) => `
+                    <div class="list-group-item">
+                        <small class="text-danger fw-bold">${err.type || 'Error'}</small>
+                        <p class="mb-0 small text-muted">${err.message || ''}</p>
+                        <small class="text-muted">${err.userEmail || ''} · ${err.timestamp && err.timestamp.toDate ? new Date(err.timestamp.toDate()).toLocaleString('es-AR') : ''}</small>
+                    </div>
+                `).join('');
             }
         } catch (err) {
             console.error('[Admin] Load dashboard error:', err);
