@@ -53,7 +53,7 @@ const Auth = {
     },
 
     isAdmin() {
-        return this._currentFirebaseUser && this._currentFirebaseUser.email === 'sebarruso96@gmail.com';
+        return this._currentFirebaseUser && this._currentFirebaseUser.email === 'sebarusso96@gmail.com';
     },
 
     showApp(user) {
