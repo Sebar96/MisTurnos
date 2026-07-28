@@ -91,6 +91,9 @@ const Patients = {
                             <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="Patients.showModal('${patient.id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
+                            <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="Patients.delete('${patient.id}', '${patient.name.replace(/'/g, "\\'")}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
                             <button class="btn btn-outline-${patient.status === 'active' ? 'warning' : 'success'} btn-sm"
                                     title="${patient.status === 'active' ? 'Desactivar' : 'Activar'}"
                                     onclick="Patients.toggleStatus('${patient.id}')">
@@ -360,6 +363,23 @@ const Patients = {
         } catch (err) {
             console.error('[Patients] Toggle status error:', err);
             App.showToast('Error al cambiar estado', 'danger');
+        }
+    },
+
+    async delete(patientId, patientName) {
+        if (!confirm(`¿Eliminar a ${patientName}? Esta acción no se puede deshacer.`)) return;
+
+        const { doc, deleteDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+        const uid = Auth.getUid();
+
+        try {
+            await deleteDoc(doc(db, 'users', uid, 'patients', patientId));
+            App.showToast(`${patientName} eliminado`, 'success');
+            this.render();
+        } catch (err) {
+            console.error('[Patients] Delete error:', err);
+            App.showToast('Error al eliminar paciente', 'danger');
         }
     }
 };
