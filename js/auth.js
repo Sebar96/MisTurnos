@@ -61,14 +61,13 @@ const Auth = {
         document.getElementById('navbar').classList.remove('d-none');
         document.getElementById('navUserName').textContent = user.name || user.email || 'Usuario';
 
-        const isAdmin = this.isAdmin();
-        console.log('[Auth] isAdmin:', isAdmin, 'email:', this._currentFirebaseUser?.email);
+        const adminItem = document.getElementById('navAdminItem');
 
-        if (isAdmin) {
-            document.getElementById('navAdminItem').style.display = '';
+        if (this.isAdmin()) {
+            if (adminItem) adminItem.style.display = '';
             App.navigate('admin');
         } else {
-            document.getElementById('navAdminItem').style.display = 'none';
+            if (adminItem) adminItem.style.display = 'none';
             App.navigate('dashboard');
         }
     },
