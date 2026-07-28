@@ -61,7 +61,10 @@ const Auth = {
         document.getElementById('navbar').classList.remove('d-none');
         document.getElementById('navUserName').textContent = user.name || user.email || 'Usuario';
 
-        if (this.isAdmin()) {
+        const isAdmin = this.isAdmin();
+        console.log('[Auth] isAdmin:', isAdmin, 'email:', this._currentFirebaseUser?.email);
+
+        if (isAdmin) {
             document.getElementById('navAdminItem').style.display = '';
             App.navigate('admin');
         } else {
