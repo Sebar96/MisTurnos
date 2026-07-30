@@ -4,22 +4,27 @@
 
 const Patients = {
 
-    _cache: [],
+    _currentPage: 1,
+    _perPage: 20,
 
     async getAll() {
         const uid = Auth.getUid();
         if (!uid) return [];
+
+        const cached = Cache.get(`patients_${uid}`);
+        if (cached) return cached;
 
         const { collection, getDocs } = window.firebaseExports;
         const db = window.firebaseDB;
 
         try {
             const snapshot = await getDocs(collection(db, 'users', uid, 'patients'));
-            this._cache = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-            return this._cache;
+            const patients = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+            Cache.set(`patients_${uid}`, patients);
+            return patients;
         } catch (err) {
             console.error('[Patients] Error getting patients:', err);
-            return this._cache;
+            return [];
         }
     },
 
@@ -29,8 +34,10 @@ const Patients = {
     },
 
     async render() {
-        const patients = await this.getAll();
         const container = document.getElementById('patientsList');
+        App.showSkeleton(container, 'cards');
+
+        const patients = await this.getAll();
 
         if (patients.length === 0) {
             container.innerHTML = `
@@ -45,7 +52,45 @@ const Patients = {
         }
 
         this.populateInsuranceFilter(patients);
-        container.innerHTML = patients.map((patient) => this.renderCard(patient)).join('');
+        this._allPatients = patients;
+        this._currentPage = 1;
+        this.renderPage();
+    },
+
+    renderPage() {
+        const patients = this._allPatients || [];
+        const container = document.getElementById('patientsList');
+        const totalPages = Math.ceil(patients.length / this._perPage);
+        const start = (this._currentPage - 1) * this._perPage;
+        const pagePatients = patients.slice(start, start + this._perPage);
+
+        let html = pagePatients.map((patient) => this.renderCard(patient)).join('');
+
+        if (totalPages > 1) {
+            html += `
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mt-3 py-2">
+                        <small class="text-muted">Mostrando ${start + 1}-${Math.min(start + this._perPage, patients.length)} de ${patients.length} pacientes</small>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" ${this._currentPage === 1 ? 'disabled' : ''} onclick="Patients.goToPage(${this._currentPage - 1})">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled>Página ${this._currentPage} de ${totalPages}</button>
+                            <button class="btn btn-outline-secondary" ${this._currentPage === totalPages ? 'disabled' : ''} onclick="Patients.goToPage(${this._currentPage + 1})">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    },
+
+    goToPage(page) {
+        this._currentPage = page;
+        this.renderPage();
+        document.getElementById('patientsList').scrollIntoView({ behavior: 'smooth' });
     },
 
     renderCard(patient) {
@@ -62,7 +107,7 @@ const Patients = {
 
         return `
             <div class="col-sm-6 col-lg-4 col-xl-3">
-                <div class="card patient-card border-0 shadow-sm h-100">
+                <div class="card patient-card border-0 shadow-sm h-100" onclick="Patients.showDetail('${patient.id}')">
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
                             <div class="patient-avatar me-3">${initials}</div>
@@ -79,24 +124,24 @@ const Patients = {
                         </div>
                         ${patient.reason ? `<p class="small text-muted mb-3 text-truncate"><i class="bi bi-chat-dots me-1"></i>${patient.reason}</p>` : ''}
                         ${patient.phone ? `<p class="small mb-3"><i class="bi bi-telephone me-1 text-primary"></i>${patient.phone}</p>` : ''}
-                        <div class="d-flex gap-2 flex-wrap">
+                        <div class="d-flex gap-2 flex-wrap" onclick="event.stopPropagation()">
                             ${patient.phone ? `
-                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="App.openWhatsApp('${patient.phone}', 'Hola ${patient.name}, le escribimos desde MisTurnos.')">
+                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="event.stopPropagation(); App.openWhatsApp('${patient.phone}', 'Hola ${patient.name}, le escribimos desde MisTurnos.')">
                                     <i class="bi bi-whatsapp"></i>
                                 </button>
                             ` : ''}
-                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="Appointments.showModal(null, '${patient.id}')">
+                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="event.stopPropagation(); Appointments.showModal(null, '${patient.id}')">
                                 <i class="bi bi-calendar-plus"></i>
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="Patients.showModal('${patient.id}')">
+                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="event.stopPropagation(); Patients.showModal('${patient.id}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="Patients.delete('${patient.id}', '${patient.name.replace(/'/g, "\\'")}')">
+                            <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="event.stopPropagation(); Patients.delete('${patient.id}', '${patient.name.replace(/'/g, "\\'")}')">
                                 <i class="bi bi-trash"></i>
                             </button>
                             <button class="btn btn-outline-${patient.status === 'active' ? 'warning' : 'success'} btn-sm"
                                     title="${patient.status === 'active' ? 'Desactivar' : 'Activar'}"
-                                    onclick="Patients.toggleStatus('${patient.id}')">
+                                    onclick="event.stopPropagation(); Patients.toggleStatus('${patient.id}')">
                                 <i class="bi bi-${patient.status === 'active' ? 'pause-circle' : 'play-circle'}"></i>
                             </button>
                         </div>
@@ -128,6 +173,9 @@ const Patients = {
             patients = patients.filter((p) => p.insurance === insuranceFilter);
         }
 
+        this._allPatients = patients;
+        this._currentPage = 1;
+
         const container = document.getElementById('patientsList');
         if (patients.length === 0) {
             container.innerHTML = `
@@ -136,7 +184,7 @@ const Patients = {
                     No se encontraron pacientes con esos filtros
                 </div>`;
         } else {
-            container.innerHTML = patients.map((p) => this.renderCard(p)).join('');
+            this.renderPage();
         }
     },
 
@@ -286,12 +334,14 @@ const Patients = {
                     ...data,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
+                Cache.invalidate(`patients_${uid}`);
                 App.showToast('Paciente actualizado correctamente', 'success');
             } else {
                 await addDoc(collection(db, 'users', uid, 'patients'), {
                     ...data,
                     createdAt: new Date().toISOString()
                 });
+                Cache.invalidate(`patients_${uid}`);
                 App.showToast('Paciente creado correctamente', 'success');
             }
 
@@ -329,6 +379,7 @@ const Patients = {
                 createdAt: new Date().toISOString()
             });
 
+            Cache.invalidate(`patients_${uid}`);
             App.showToast(`${name} creado correctamente`, 'success');
 
             if (typeof callback === 'function') {
@@ -358,6 +409,7 @@ const Patients = {
                 updatedAt: new Date().toISOString()
             }, { merge: true });
 
+            Cache.invalidate(`patients_${uid}`);
             App.showToast(`${patient.name} ahora está ${newStatus === 'active' ? 'activo' : 'inactivo'}`, 'info');
             this.render();
         } catch (err) {
@@ -367,7 +419,11 @@ const Patients = {
     },
 
     async delete(patientId, patientName) {
-        if (!confirm(`¿Eliminar a ${patientName}? Esta acción no se puede deshacer.`)) return;
+        const confirmed = await App.confirmAction(
+            `¿Eliminar a ${patientName}? Esta acción no se puede deshacer.`,
+            { confirmText: 'Eliminar', confirmColor: 'danger' }
+        );
+        if (!confirmed) return;
 
         const { doc, deleteDoc } = window.firebaseExports;
         const db = window.firebaseDB;
@@ -375,11 +431,137 @@ const Patients = {
 
         try {
             await deleteDoc(doc(db, 'users', uid, 'patients', patientId));
+            Cache.invalidate(`patients_${uid}`);
             App.showToast(`${patientName} eliminado`, 'success');
             this.render();
         } catch (err) {
             console.error('[Patients] Delete error:', err);
             App.showToast('Error al eliminar paciente', 'danger');
         }
+    },
+
+    async showDetail(patientId) {
+        App.navigate('patient-detail', { isSubPage: true });
+
+        const container = document.getElementById('page-patient-detail');
+        const content = container.querySelector('.detail-content');
+        App.showSkeleton(content, 'stats');
+
+        const patient = await this.getById(patientId);
+        if (!patient) {
+            container.querySelector('.detail-content').innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                    Paciente no encontrado
+                </div>`;
+            return;
+        }
+
+        const appointments = (await Appointments.getAll())
+            .filter(a => a.patientId === patientId)
+            .sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+
+        const initials = patient.name
+            .split(' ')
+            .filter((w) => w.length > 2)
+            .map((w) => w[0])
+            .slice(0, 2)
+            .join('')
+            .toUpperCase();
+
+        const statusClass = patient.status === 'active' ? 'bg-success' : 'bg-secondary';
+        const statusText = patient.status === 'active' ? 'Activo' : 'Inactivo';
+
+        const renderInfoRow = (label, value, icon) => {
+            if (!value) return '';
+            return `
+                <div class="detail-info-row">
+                    <span class="detail-info-label"><i class="bi ${icon} me-1"></i>${label}</span>
+                    <span class="detail-info-value">${value}</span>
+                </div>`;
+        };
+
+        let appointmentsHtml = '';
+        if (appointments.length === 0) {
+            appointmentsHtml = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x d-block mb-2 fs-4"></i>
+                    No hay turnos registrados
+                </div>`;
+        } else {
+            appointmentsHtml = appointments.slice(0, 10).map(a => {
+                const statusBadge = `<span class="badge badge-status badge-${a.status}">${Appointments.getStatusLabel(a.status)}</span>`;
+                return `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="fw-semibold">${App.formatDateShort(a.date)}</span>
+                            <span class="ms-2 text-muted">${a.time}</span>
+                            ${a.reason ? `<span class="ms-2 small text-muted">${a.reason}</span>` : ''}
+                        </div>
+                        ${statusBadge}
+                    </div>`;
+            }).join('');
+            if (appointments.length > 10) {
+                appointmentsHtml += `
+                    <div class="text-center py-2">
+                        <small class="text-muted">Mostrando 10 de ${appointments.length} turnos</small>
+                    </div>`;
+            }
+        }
+
+        container.querySelector('.detail-content').innerHTML = `
+            <div class="detail-header">
+                <div class="detail-avatar">${initials}</div>
+                <div class="flex-grow-1">
+                    <h3 class="fw-bold mb-1">${patient.name}</h3>
+                    <span class="badge ${statusClass}">${statusText}</span>
+                    ${patient.insurance ? `<span class="badge bg-light text-dark ms-1">${patient.insurance}</span>` : ''}
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="Appointments.showModal(null, '${patient.id}')">
+                        <i class="bi bi-calendar-plus me-1"></i>Nuevo Turno
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="Patients.showModal('${patient.id}')">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h6 class="detail-section-title">Información de Contacto</h6>
+                            ${renderInfoRow('Teléfono', patient.phone, 'bi-telephone')}
+                            ${renderInfoRow('Email', patient.email, 'bi-envelope')}
+                            ${renderInfoRow('Motivo', patient.reason, 'bi-chat-dots')}
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="detail-section-title">Información Médica</h6>
+                            ${patient.cardiac === 'si' ? renderInfoRow('Cardiopatía', patient.cardiacDetail || 'Sí', 'bi-heart-pulse') : ''}
+                            ${renderInfoRow('Enfermedades', patient.diseases, 'bi-activity')}
+                            ${renderInfoRow('Alergias', patient.allergies, 'bi-exclamation-triangle')}
+                            ${renderInfoRow('Medicación', patient.medication, 'bi-capsule')}
+                            ${renderInfoRow('Observaciones', patient.observations, 'bi-sticky')}
+                            ${!patient.cardiac && !patient.diseases && !patient.allergies && !patient.medication && !patient.observations ?
+                                '<div class="text-muted small">Sin información médica cargada</div>' : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2"></i>Turnos Recientes</h6>
+                        </div>
+                        <div class="card-body">
+                            ${appointmentsHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
     }
 };

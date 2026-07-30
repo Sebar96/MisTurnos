@@ -70,6 +70,8 @@ const Auth = {
             if (adminItem) adminItem.style.display = 'none';
             App.navigate('dashboard');
         }
+
+        setTimeout(() => App.checkOnboarding(), 500);
     },
 
     showLogin() {
@@ -172,7 +174,11 @@ const Auth = {
     },
 
     async logout() {
-        if (!confirm('¿Seguro que querés cerrar sesión?')) return;
+        const confirmed = await App.confirmAction('¿Seguro que querés cerrar sesión?', {
+            confirmText: 'Cerrar sesión',
+            confirmColor: 'danger'
+        });
+        if (!confirmed) return;
 
         const { signOut } = window.firebaseExports;
         const auth = window.firebaseAuth;
@@ -182,6 +188,38 @@ const Auth = {
             App.showToast('Sesión cerrada', 'info');
         } catch (err) {
             console.error('[Auth] Logout error:', err);
+        }
+    },
+
+    async loginWithGoogle() {
+        try {
+            const { GoogleAuthProvider, signInWithPopup } = window.firebaseExports;
+            const auth = window.firebaseAuth;
+            const provider = new GoogleAuthProvider();
+
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            const { doc, getDoc, setDoc } = window.firebaseExports;
+            const db = window.firebaseDB;
+
+            const docSnap = await getDoc(doc(db, 'users', user.uid));
+            if (!docSnap.exists()) {
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: user.displayName || '',
+                    email: user.email || '',
+                    specialty: '',
+                    photo: user.photoURL || '',
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            App.showToast('¡Bienvenido!', 'success');
+        } catch (err) {
+            console.error('[Auth] Google login error:', err);
+            if (err.code !== 'auth/popup-closed-by-user') {
+                App.showToast('Error al iniciar sesión con Google', 'danger');
+            }
         }
     }
 };

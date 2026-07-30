@@ -4,22 +4,27 @@
 
 const Appointments = {
 
-    _cache: [],
+    _currentPage: 1,
+    _perPage: 20,
 
     async getAll() {
         const uid = Auth.getUid();
         if (!uid) return [];
+
+        const cached = Cache.get(`appointments_${uid}`);
+        if (cached) return cached;
 
         const { collection, getDocs } = window.firebaseExports;
         const db = window.firebaseDB;
 
         try {
             const snapshot = await getDocs(collection(db, 'users', uid, 'appointments'));
-            this._cache = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-            return this._cache;
+            const appointments = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+            Cache.set(`appointments_${uid}`, appointments);
+            return appointments;
         } catch (err) {
             console.error('[Appointments] Error getting appointments:', err);
-            return this._cache;
+            return [];
         }
     },
 
@@ -29,8 +34,10 @@ const Appointments = {
     },
 
     async render() {
-        let appointments = await this.getAll();
         const container = document.getElementById('appointmentsList');
+        App.showSkeleton(container, 'list');
+
+        let appointments = await this.getAll();
         const patients = await Patients.getAll();
 
         appointments = this.applyFilters(appointments);
@@ -53,7 +60,21 @@ const Appointments = {
             return a.time.localeCompare(b.time);
         });
 
-        container.innerHTML = appointments.map((appt) => {
+        this._allAppointments = appointments;
+        this._allPatients = patients;
+        this._currentPage = 1;
+        this.renderPage();
+    },
+
+    renderPage() {
+        const appointments = this._allAppointments || [];
+        const patients = this._allPatients || [];
+        const container = document.getElementById('appointmentsList');
+        const totalPages = Math.ceil(appointments.length / this._perPage);
+        const start = (this._currentPage - 1) * this._perPage;
+        const pageAppointments = appointments.slice(start, start + this._perPage);
+
+        let html = pageAppointments.map((appt) => {
             const patient = patients.find((p) => p.id === appt.patientId);
             const patientName = patient ? patient.name : 'Paciente eliminado';
             const patientPhone = patient ? patient.phone : '';
@@ -126,6 +147,32 @@ const Appointments = {
                     </div>
                 </div>`;
         }).join('');
+
+        if (totalPages > 1) {
+            html += `
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <small class="text-muted">Mostrando ${start + 1}-${Math.min(start + this._perPage, appointments.length)} de ${appointments.length} turnos</small>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" ${this._currentPage === 1 ? 'disabled' : ''} onclick="Appointments.goToPage(${this._currentPage - 1})">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled>Página ${this._currentPage} de ${totalPages}</button>
+                            <button class="btn btn-outline-secondary" ${this._currentPage === totalPages ? 'disabled' : ''} onclick="Appointments.goToPage(${this._currentPage + 1})">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    },
+
+    goToPage(page) {
+        this._currentPage = page;
+        this.renderPage();
+        document.getElementById('appointmentsList').scrollIntoView({ behavior: 'smooth' });
     },
 
     applyFilters(appointments) {
@@ -149,7 +196,7 @@ const Appointments = {
         }
 
         if (patientSearch) {
-            const patients = this._patientsCache || [];
+            const patients = this._allPatients || [];
             const matchingIds = patients
                 .filter((p) => p.name.toLowerCase().includes(patientSearch))
                 .map((p) => p.id);
@@ -157,6 +204,33 @@ const Appointments = {
         }
 
         return filtered;
+    },
+
+    async filter() {
+        let appointments = await this.getAll();
+        const patients = await Patients.getAll();
+
+        appointments = this.applyFilters(appointments);
+
+        this._allAppointments = appointments;
+        this._allPatients = patients;
+        this._currentPage = 1;
+
+        const container = document.getElementById('appointmentsList');
+        if (appointments.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                    No se encontraron turnos con esos filtros
+                </div>`;
+        } else {
+            appointments.sort((a, b) => {
+                const dateCompare = a.date.localeCompare(b.date);
+                if (dateCompare !== 0) return dateCompare;
+                return a.time.localeCompare(b.time);
+            });
+            this.renderPage();
+        }
     },
 
     filter() {
@@ -487,12 +561,14 @@ const Appointments = {
                     ...data,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
+                Cache.invalidate(`appointments_${uid}`);
                 App.showToast(reschedule ? 'Turno reprogramado' : 'Turno actualizado', 'success');
             } else {
                 await addDoc(collection(db, 'users', uid, 'appointments'), {
                     ...data,
                     createdAt: new Date().toISOString()
                 });
+                Cache.invalidate(`appointments_${uid}`);
                 App.showToast('Turno creado correctamente', 'success');
             }
 
@@ -515,6 +591,8 @@ const Appointments = {
                 updatedAt: new Date().toISOString()
             }, { merge: true });
 
+            Cache.invalidate(`appointments_${uid}`);
+
             const labels = {
                 confirmed: 'confirmado',
                 completed: 'realizado',
@@ -534,34 +612,41 @@ const Appointments = {
         const appointment = await this.getById(appointmentId);
         if (!appointment) return;
 
+        const patient = await Patients.getById(appointment.patientId);
+        const patientName = patient ? patient.name : 'este paciente';
+
         const apptDateTime = new Date(appointment.date + 'T' + appointment.time);
         const now = new Date();
         const diffMinutes = (apptDateTime - now) / (1000 * 60);
 
+        let message = `¿Cancelás el turno de ${patientName} el ${App.formatDateHuman(appointment.date)} a las ${appointment.time}?`;
         if (diffMinutes < 30 && diffMinutes > 0) {
-            const confirmed = confirm(
-                `⚠️ ¡Atención!\n\n` +
-                `Este turno es en ${Math.round(diffMinutes)} minutos.\n` +
-                `Si lo cancelás ahora, el paciente podría no recibir el aviso a tiempo.\n\n` +
-                `¿Estás seguro de que querés cancelarlo?`
-            );
-            if (!confirmed) return;
+            message = `¡Atención! Este turno es en ${Math.round(diffMinutes)} minutos. ${message}`;
         }
 
-        if (!confirm('¿Confirmás la cancelación de este turno?')) return;
-
-        const patient = await Patients.getById(appointment.patientId);
+        const confirmed = await App.confirmAction(message, {
+            confirmText: 'Cancelar turno',
+            confirmColor: 'danger'
+        });
+        if (!confirmed) return;
 
         await this.changeStatus(appointmentId, 'cancelled');
 
         if (patient && patient.phone) {
-            const sendWhatsApp = confirm(
-                `¿Querés enviar un aviso de cancelación por WhatsApp a ${patient.name}?`
+            const sendWhatsApp = await App.confirmAction(
+                `¿Enviar aviso de cancelación por WhatsApp a ${patientName}?`,
+                {
+                    confirmText: 'Enviar',
+                    confirmColor: 'success',
+                    iconClass: 'bi-whatsapp',
+                    iconBg: 'bg-success bg-opacity-10 text-success',
+                    title: 'Enviar WhatsApp'
+                }
             );
             if (sendWhatsApp) {
                 App.openWhatsApp(
                     patient.phone,
-                    `Hola ${patient.name}, le informamos que su turno del ${App.formatDateHuman(appointment.date)} a las ${appointment.time} ha sido cancelado. Si desea reprogramar, por favor comuníquese con nosotros. Disculpe las molestias.`
+                    `Hola ${patientName}, le informamos que su turno del ${App.formatDateHuman(appointment.date)} a las ${appointment.time} ha sido cancelado. Si desea reprogramar, por favor comuníquese con nosotros. Disculpe las molestias.`
                 );
             }
         }

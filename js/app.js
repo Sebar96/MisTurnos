@@ -2,6 +2,38 @@
  * APP.JS - LÓGICA PRINCIPAL DE MisTurnos
  */
 
+const Cache = {
+    _store: {},
+    _timestamps: {},
+    _ttl: 5 * 60 * 1000,
+
+    get(key) {
+        if (!this._store[key]) return null;
+        const age = Date.now() - (this._timestamps[key] || 0);
+        if (age > this._ttl) {
+            delete this._store[key];
+            delete this._timestamps[key];
+            return null;
+        }
+        return this._store[key];
+    },
+
+    set(key, data) {
+        this._store[key] = data;
+        this._timestamps[key] = Date.now();
+    },
+
+    invalidate(key) {
+        delete this._store[key];
+        delete this._timestamps[key];
+    },
+
+    invalidateAll() {
+        this._store = {};
+        this._timestamps = {};
+    }
+};
+
 const App = {
 
     init() {
@@ -10,6 +42,8 @@ const App = {
         this.loadTheme();
         Auth.checkSession();
         this.setDefaultDates();
+
+        window.addEventListener('hashchange', () => this.handleHashChange());
 
         const modalEl = document.getElementById('appModal');
         if (modalEl) {
@@ -65,7 +99,14 @@ const App = {
         window.location.reload();
     },
 
-    navigate(page) {
+    _navHistory: [],
+
+    navigate(page, options = {}) {
+        const currentPage = this.getCurrentPage();
+        if (currentPage && !options.isBack) {
+            this._navHistory.push(currentPage);
+        }
+
         document.querySelectorAll('.page-section').forEach((section) => {
             section.classList.add('d-none');
         });
@@ -81,6 +122,10 @@ const App = {
                 link.classList.add('active');
             }
         });
+
+        if (window.location.hash !== '#' + page) {
+            history.pushState({ page: page }, '', '#' + page);
+        }
 
         switch (page) {
             case 'dashboard':
@@ -98,11 +143,40 @@ const App = {
             case 'admin':
                 Admin.loadDashboard();
                 break;
+            case 'patient-detail':
+                break;
         }
 
         const navCollapse = document.getElementById('navContent');
         const bsCollapse = bootstrap.Collapse.getInstance(navCollapse);
         if (bsCollapse) bsCollapse.hide();
+    },
+
+    getCurrentPage() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('page-' + hash)) return hash;
+        for (const section of document.querySelectorAll('.page-section')) {
+            if (!section.classList.contains('d-none') && section.id !== 'page-login') {
+                return section.id.replace('page-', '');
+            }
+        }
+        return null;
+    },
+
+    goBack() {
+        const prev = this._navHistory.pop();
+        if (prev) {
+            this.navigate(prev, { isBack: true });
+        } else {
+            this.navigate('dashboard');
+        }
+    },
+
+    handleHashChange() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('page-' + hash)) {
+            this.navigate(hash, { isBack: true });
+        }
     },
 
     async loadDashboard() {
@@ -405,6 +479,197 @@ const App = {
         const cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
         const encodedMsg = encodeURIComponent(message);
         window.open(`https://wa.me/${cleanPhone}?text=${encodedMsg}`, '_blank');
+    },
+
+    showSkeleton(container, type = 'cards') {
+        if (!container) return;
+        let html = '';
+
+        if (type === 'cards') {
+            for (let i = 0; i < 6; i++) {
+                html += `
+                    <div class="col-sm-6 col-lg-4 col-xl-3">
+                        <div class="skeleton skeleton-card"></div>
+                    </div>`;
+            }
+        } else if (type === 'list') {
+            for (let i = 0; i < 5; i++) {
+                html += `
+                    <div class="skeleton-list-item">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="flex-grow-1">
+                            <div class="skeleton skeleton-line skeleton-line-medium"></div>
+                            <div class="skeleton skeleton-line skeleton-line-short"></div>
+                        </div>
+                        <div class="skeleton skeleton-badge"></div>
+                    </div>`;
+            }
+        } else if (type === 'stats') {
+            html = '<div class="row g-3">';
+            for (let i = 0; i < 3; i++) {
+                html += `
+                    <div class="col-6 col-lg-4">
+                        <div class="skeleton skeleton-card"></div>
+                    </div>`;
+            }
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+    },
+
+    hideSkeleton() {
+        return;
+    },
+
+    confirmAction(message, options = {}) {
+        const confirmText = options.confirmText || 'Confirmar';
+        const confirmColor = options.confirmColor || 'danger';
+        const iconClass = options.iconClass || 'bi-exclamation-triangle';
+        const iconBg = options.iconBg || 'bg-danger bg-opacity-10 text-danger';
+        const title = options.title || '¿Estás seguro?';
+
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-modal-overlay';
+            overlay.innerHTML = `
+                <div class="confirm-modal-card">
+                    <div class="confirm-modal-icon ${iconBg}">
+                        <i class="bi ${iconClass}"></i>
+                    </div>
+                    <div class="confirm-modal-title">${title}</div>
+                    <div class="confirm-modal-message">${message}</div>
+                    <div class="confirm-modal-actions">
+                        <button class="btn btn-secondary" data-confirm="false">Cancelar</button>
+                        <button class="btn btn-${confirmColor}" data-confirm="true">${confirmText}</button>
+                    </div>
+                </div>`;
+
+            document.body.appendChild(overlay);
+
+            overlay.querySelectorAll('[data-confirm]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    overlay.remove();
+                    resolve(btn.getAttribute('data-confirm') === 'true');
+                });
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                    resolve(false);
+                }
+            });
+        });
+    },
+
+    checkOnboarding() {
+        const user = Auth.getCurrentUser();
+        if (!user) return;
+
+        const uid = Auth.getUid();
+        if (!uid) return;
+
+        if (localStorage.getItem('misturnos_onboarded_' + uid)) return;
+
+        const { doc, getDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        getDoc(doc(db, 'users', uid)).then((docSnap) => {
+            if (docSnap.exists() && docSnap.data().onboardingDone) {
+                localStorage.setItem('misturnos_onboarded_' + uid, '1');
+                return;
+            }
+            this.showOnboarding();
+        });
+    },
+
+    _onboardingStep: 0,
+
+    showOnboarding() {
+        this._onboardingStep = 0;
+        this.renderOnboardingStep();
+    },
+
+    renderOnboardingStep() {
+        const steps = [
+            {
+                icon: 'bi-calendar-check',
+                title: 'Bienvenido a MisTurnos',
+                text: 'Tu app para gestionar turnos de forma simple y rápida. Te vamos a mostrar cómo funciona.'
+            },
+            {
+                icon: 'bi-people',
+                title: 'Gestioná tus Pacientes',
+                text: 'Creá fichas con datos de contacto, obra social y información médica. Todo centralizado.'
+            },
+            {
+                icon: 'bi-calendar-event',
+                title: 'Organizá tu Agenda',
+                text: 'Creá turnos, confirmalos, reprogramalos. Recibí notificaciones y enviá recordatorios por WhatsApp.'
+            },
+            {
+                icon: 'bi-rocket-takeoff',
+                title: '¡Listo para empezar!',
+                text: 'Ya podés comenzar a usar MisTurnos. Creá tu primer paciente o turno desde el panel principal.'
+            }
+        ];
+
+        const step = steps[this._onboardingStep];
+        const isLast = this._onboardingStep === steps.length - 1;
+
+        let overlay = document.getElementById('onboardingOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'onboardingOverlay';
+            overlay.className = 'onboarding-overlay';
+            document.body.appendChild(overlay);
+        }
+
+        overlay.innerHTML = `
+            <div class="onboarding-card">
+                <div class="onboarding-step-icon">
+                    <i class="bi ${step.icon}"></i>
+                </div>
+                <div class="onboarding-title">${step.title}</div>
+                <div class="onboarding-text">${step.text}</div>
+                <div class="onboarding-dots">
+                    ${steps.map((_, i) => `<div class="onboarding-dot ${i === this._onboardingStep ? 'active' : ''}"></div>`).join('')}
+                </div>
+                <div class="onboarding-actions">
+                    <button class="btn btn-outline-secondary" onclick="App.skipOnboarding()">Saltar</button>
+                    <button class="btn btn-primary" onclick="App.nextOnboardingStep()">
+                        ${isLast ? '¡Empezar!' : 'Siguiente'}
+                    </button>
+                </div>
+            </div>`;
+    },
+
+    nextOnboardingStep() {
+        this._onboardingStep++;
+        if (this._onboardingStep >= 4) {
+            this.completeOnboarding();
+        } else {
+            this.renderOnboardingStep();
+        }
+    },
+
+    skipOnboarding() {
+        this.completeOnboarding();
+    },
+
+    completeOnboarding() {
+        const overlay = document.getElementById('onboardingOverlay');
+        if (overlay) overlay.remove();
+
+        const uid = Auth.getUid();
+        if (uid) {
+            localStorage.setItem('misturnos_onboarded_' + uid, '1');
+
+            const { doc, setDoc } = window.firebaseExports;
+            const db = window.firebaseDB;
+            setDoc(doc(db, 'users', uid), { onboardingDone: true }, { merge: true });
+        }
     }
 };
 
