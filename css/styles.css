@@ -827,3 +827,35 @@ html[data-bs-theme="dark"] .btn-google:hover {
     position: relative;
     top: -0.6rem;
 }
+
+/* ===================== HEALTH INDICATORS ===================== */
+.health-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.health-indicator:last-child {
+    border-bottom: none;
+}
+
+.health-indicator i {
+    font-size: 1.1rem;
+}
+
+.health-indicator.ok i { color: #22c55e; }
+.health-indicator.warning i { color: #f59e0b; }
+.health-indicator.error i { color: #ef4444; }
+
+/* ===================== PROGRESS BAR ===================== */
+.progress {
+    background-color: var(--border-color);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.5s ease;
+}
