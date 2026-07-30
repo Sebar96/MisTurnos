@@ -513,6 +513,297 @@ html[data-bs-theme="dark"] .badge-cancelled {
     border-color: var(--primary);
 }
 
+/* ===================== SKELETON LOADING ===================== */
+.skeleton {
+    background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-body) 50%, var(--border-color) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-card {
+    height: 120px;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+}
+
+.skeleton-line {
+    height: 14px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.skeleton-line-short { width: 40%; }
+.skeleton-line-medium { width: 65%; }
+.skeleton-line-long { width: 85%; }
+
+.skeleton-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-badge {
+    width: 70px;
+    height: 24px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.skeleton-list-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    gap: 12px;
+}
+
+.skeleton-list-item:last-child {
+    border-bottom: none;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ===================== CONFIRM MODAL ===================== */
+.confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1060;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+    padding: 1rem;
+}
+
+.confirm-modal-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.confirm-modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.confirm-modal-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.confirm-modal-message {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.confirm-modal-actions .btn {
+    min-width: 120px;
+}
+
+/* ===================== GOOGLE BUTTON ===================== */
+.btn-google {
+    background: #fff;
+    border: 1px solid #dadce0;
+    color: #3c4043;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    width: 100%;
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.btn-google svg {
+    width: 20px;
+    height: 20px;
+}
+
+html[data-bs-theme="dark"] .btn-google {
+    background: #2d2d2d;
+    border-color: #555;
+    color: #e8eaed;
+}
+
+html[data-bs-theme="dark"] .btn-google:hover {
+    background: #3c3c3c;
+}
+
+/* ===================== ONBOARDING ===================== */
+.onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1070;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+    padding: 1rem;
+}
+
+.onboarding-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 2.5rem;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.onboarding-step-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: #fff;
+}
+
+.onboarding-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.onboarding-text {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.onboarding-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.onboarding-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-color);
+    transition: var(--transition);
+}
+
+.onboarding-dot.active {
+    background: var(--primary);
+    width: 28px;
+    border-radius: 5px;
+}
+
+.onboarding-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.onboarding-actions .btn {
+    min-width: 130px;
+}
+
+/* ===================== PATIENT DETAIL ===================== */
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.detail-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.detail-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-info-row:last-child {
+    border-bottom: none;
+}
+
+.detail-info-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 120px;
+    font-size: 0.9rem;
+}
+
+.detail-info-value {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.detail-section-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary);
+    display: inline-block;
+}
+
 /* ===================== UTILIDADES ===================== */
 
 .text-primary-custom {
@@ -528,4 +819,11 @@ html[data-bs-theme="dark"] .badge-cancelled {
     height: 1px;
     background-color: var(--border-color);
     margin: 1rem 0;
+}
+
+.divider-label {
+    background-color: var(--bg-card);
+    padding: 0 0.75rem;
+    position: relative;
+    top: -0.6rem;
 }
