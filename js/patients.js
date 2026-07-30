@@ -328,6 +328,14 @@ const Patients = {
             return;
         }
 
+        if (!patientId) {
+            const canAdd = await Billing.canAddPatient(uid);
+            if (!canAdd) {
+                Billing.showUpgradeModal('limit_reached');
+                return;
+            }
+        }
+
         try {
             if (patientId) {
                 await setDoc(doc(db, 'users', uid, 'patients', patientId), {
@@ -365,6 +373,12 @@ const Patients = {
 
         if (!name || !phone) {
             App.showToast('Nombre y teléfono son obligatorios', 'warning');
+            return;
+        }
+
+        const canAdd = await Billing.canAddPatient(uid);
+        if (!canAdd) {
+            Billing.showUpgradeModal('limit_reached');
             return;
         }
 

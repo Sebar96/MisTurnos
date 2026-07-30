@@ -670,6 +670,69 @@ const App = {
             const db = window.firebaseDB;
             setDoc(doc(db, 'users', uid), { onboardingDone: true }, { merge: true });
         }
+    },
+
+    showReportErrorModal() {
+        document.getElementById('modalTitle').textContent = 'Reportar Error';
+
+        document.getElementById('modalBody').innerHTML = `
+            <div class="mb-3">
+                <label class="form-label fw-semibold">¿Qué salió mal?</label>
+                <textarea class="form-control" id="reportErrorDesc" rows="4" placeholder="Describí el error que encontraste..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">¿Qué esperabas que pasara?</label>
+                <input type="text" class="form-control" id="reportErrorExpected" placeholder="Opcional">
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="reportErrorIncludeUrl" checked>
+                <label class="form-check-label" for="reportErrorIncludeUrl">
+                    Incluir URL de la página
+                </label>
+            </div>`;
+
+        document.getElementById('modalFooter').innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" onclick="App.submitErrorReport()">
+                <i class="bi bi-send me-1"></i>Enviar Reporte
+            </button>`;
+
+        const modal = new bootstrap.Modal(document.getElementById('appModal'));
+        modal.show();
+    },
+
+    async submitErrorReport() {
+        const desc = document.getElementById('reportErrorDesc').value.trim();
+        const expected = document.getElementById('reportErrorExpected').value.trim();
+        const includeUrl = document.getElementById('reportErrorIncludeUrl').checked;
+
+        if (!desc) {
+            this.showToast('Describí el error', 'warning');
+            return;
+        }
+
+        const user = Auth.getCurrentUser();
+        const { addDoc, collection } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        try {
+            await addDoc(collection(db, 'errors'), {
+                type: 'user_report',
+                message: desc,
+                expected: expected || '',
+                url: includeUrl ? window.location.href : '',
+                userEmail: user ? user.email : '',
+                userId: Auth.getUid() || '',
+                userAgent: navigator.userAgent,
+                createdAt: new Date().toISOString()
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('appModal')).hide();
+            this.showToast('Reporte enviado. ¡Gracias!', 'success');
+        } catch (err) {
+            console.error('[App] Error submitting report:', err);
+            this.showToast('Error al enviar el reporte', 'danger');
+        }
     }
 };
 

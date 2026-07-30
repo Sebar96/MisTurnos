@@ -146,10 +146,17 @@ const Auth = {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
+            const trialExpiry = new Date();
+            trialExpiry.setDate(trialExpiry.getDate() + 30);
+
             await setDoc(doc(db, 'users', uid), {
                 name: name,
                 specialty: specialty,
                 email: email,
+                planId: 'basic',
+                planTrial: true,
+                planTrialExpiry: trialExpiry.toISOString(),
+                subscriptionStatus: 'active',
                 createdAt: new Date().toISOString()
             });
 
@@ -205,11 +212,18 @@ const Auth = {
 
             const docSnap = await getDoc(doc(db, 'users', user.uid));
             if (!docSnap.exists()) {
+                const trialExpiry = new Date();
+                trialExpiry.setDate(trialExpiry.getDate() + 30);
+
                 await setDoc(doc(db, 'users', user.uid), {
                     name: user.displayName || '',
                     email: user.email || '',
                     specialty: '',
                     photo: user.photoURL || '',
+                    planId: 'basic',
+                    planTrial: true,
+                    planTrialExpiry: trialExpiry.toISOString(),
+                    subscriptionStatus: 'active',
                     createdAt: new Date().toISOString()
                 });
             }

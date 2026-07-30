@@ -241,6 +241,279 @@ const Admin = {
             case 'recent': this.loadDashboard(); break;
             case 'users': this.loadUsers(); break;
             case 'errors': this.loadErrors(); break;
+            case 'controls': this.loadSystemCheck(); break;
+        }
+    },
+
+    async runSystemCheck() {
+        const { collection, getDocs } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        const healthContainer = document.getElementById('systemHealthList');
+        healthContainer.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-hourglass-split me-2"></i>Verificando...</div>';
+
+        const checks = [];
+
+        // 1. Firebase connection
+        try {
+            await getDocs(collection(db, 'users'));
+            checks.push({ name: 'Firebase Firestore', status: 'ok', detail: 'Conectado' });
+        } catch (err) {
+            checks.push({ name: 'Firebase Firestore', status: 'error', detail: 'Error de conexión' });
+        }
+
+        // 2. Service Worker
+        if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && reg.active) {
+                checks.push({ name: 'Service Worker', status: 'ok', detail: 'Activo (scope: ' + reg.scope + ')' });
+            } else {
+                checks.push({ name: 'Service Worker', status: 'warning', detail: 'No activo' });
+            }
+        } else {
+            checks.push({ name: 'Service Worker', status: 'error', detail: 'No soportado' });
+        }
+
+        // 3. Authentication
+        try {
+            const auth = window.firebaseAuth;
+            if (auth && auth.currentUser) {
+                checks.push({ name: 'Authentication', status: 'ok', detail: 'Sesión activa' });
+            } else {
+                checks.push({ name: 'Authentication', status: 'warning', detail: 'No hay sesión activa' });
+            }
+        } catch (err) {
+            checks.push({ name: 'Authentication', status: 'error', detail: 'Error' });
+        }
+
+        // 4. Cache
+        if (typeof Cache !== 'undefined' && Cache._store) {
+            const cacheSize = Object.keys(Cache._store).length;
+            checks.push({ name: 'Caché en memoria', status: 'ok', detail: cacheSize + ' entradas' });
+        } else {
+            checks.push({ name: 'Caché en memoria', status: 'warning', detail: 'No disponible' });
+        }
+
+        // 5. Users count
+        let totalUsers = 0;
+        let totalPatients = 0;
+        let totalAppointments = 0;
+        let plans = { basic: 0, professional: 0, clinic: 0 };
+        let trialsActive = 0;
+        let trialsExpired = 0;
+
+        try {
+            const usersSnapshot = await getDocs(collection(db, 'users'));
+            totalUsers = usersSnapshot.size;
+
+            for (const userDoc of usersSnapshot.docs) {
+                const userData = userDoc.data();
+
+                // Plans distribution
+                const planId = userData.planId || 'basic';
+                plans[planId] = (plans[planId] || 0) + 1;
+
+                // Trials
+                if (userData.planTrial && userData.planTrialExpiry) {
+                    if (new Date() > new Date(userData.planTrialExpiry)) {
+                        trialsExpired++;
+                    } else {
+                        trialsActive++;
+                    }
+                }
+
+                try {
+                    const patientsSnapshot = await getDocs(collection(db, 'users', userDoc.id, 'patients'));
+                    totalPatients += patientsSnapshot.size;
+
+                    const apptsSnapshot = await getDocs(collection(db, 'users', userDoc.id, 'appointments'));
+                    totalAppointments += apptsSnapshot.size;
+                } catch (e) {}
+            }
+
+            checks.push({ name: 'Usuarios', status: 'ok', detail: totalUsers + ' registrados' });
+            checks.push({ name: 'Pacientes', status: 'ok', detail: totalPatients + ' totales' });
+            checks.push({ name: 'Turnos', status: 'ok', detail: totalAppointments + ' totales' });
+        } catch (err) {
+            checks.push({ name: 'Datos', status: 'error', detail: 'Error al contar' });
+        }
+
+        // 6. Errors
+        let errors24h = 0;
+        let errors7d = 0;
+
+        try {
+            const errorsSnapshot = await getDocs(collection(db, 'errors'));
+            const now = new Date();
+            const dayAgo = new Date(now - 24 * 60 * 60 * 1000);
+            const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+            errorsSnapshot.docs.forEach((doc) => {
+                const err = doc.data();
+                if (err.timestamp) {
+                    const errDate = typeof err.timestamp === 'string' ? new Date(err.timestamp) : (err.timestamp.toDate ? err.timestamp.toDate() : new Date(err.timestamp));
+                    if (errDate > dayAgo) errors24h++;
+                    if (errDate > weekAgo) errors7d++;
+                }
+            });
+
+            const errorStatus = errors24h > 5 ? 'warning' : 'ok';
+            checks.push({ name: 'Errores (24h)', status: errorStatus, detail: errors24h + ' reportes' });
+            checks.push({ name: 'Errores (7 días)', status: errors7d > 20 ? 'warning' : 'ok', detail: errors7d + ' reportes' });
+        } catch (err) {
+            checks.push({ name: 'Errores', status: 'error', detail: 'Error al contar' });
+        }
+
+        // Render health indicators
+        this.renderHealthList(checks);
+
+        // Render plan distribution
+        this.renderPlanDistribution(plans, trialsActive, trialsExpired);
+
+        // Save check to Firestore
+        try {
+            const { addDoc, collection: col } = window.firebaseExports;
+            await addDoc(col(db, 'systemChecks'), {
+                timestamp: new Date().toISOString(),
+                totalUsers,
+                totalPatients,
+                totalAppointments,
+                errors24h,
+                errors7d,
+                plans,
+                trialsActive,
+                trialsExpired,
+                checks: checks.map(c => ({ name: c.name, status: c.status }))
+            });
+        } catch (err) {
+            console.error('[Admin] Error saving check:', err);
+        }
+
+        // Update last check time
+        document.getElementById('lastCheckTime').textContent = 'Ahora mismo';
+
+        // Load history
+        this.loadChecksHistory();
+    },
+
+    renderHealthList(checks) {
+        const container = document.getElementById('systemHealthList');
+        const statusIcons = {
+            ok: '<i class="bi bi-check-circle-fill text-success"></i>',
+            warning: '<i class="bi bi-exclamation-triangle-fill text-warning"></i>',
+            error: '<i class="bi bi-x-circle-fill text-danger"></i>'
+        };
+
+        container.innerHTML = checks.map((check) => `
+            <div class="d-flex align-items-center justify-content-between py-2 border-bottom" style="border-color: var(--border-color) !important;">
+                <div class="d-flex align-items-center gap-2">
+                    ${statusIcons[check.status]}
+                    <span class="fw-semibold">${check.name}</span>
+                </div>
+                <span class="text-muted small">${check.detail}</span>
+            </div>
+        `).join('');
+    },
+
+    renderPlanDistribution(plans, trialsActive, trialsExpired) {
+        const container = document.getElementById('planDistribution');
+        const total = Object.values(plans).reduce((a, b) => a + b, 0);
+
+        if (total === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-4">Sin usuarios</div>';
+            return;
+        }
+
+        const planNames = { basic: 'Básico', professional: 'Profesional', clinic: 'Consultorio' };
+        const planColors = { basic: 'secondary', professional: 'primary', clinic: 'success' };
+
+        let html = '';
+
+        for (const [key, count] of Object.entries(plans)) {
+            if (count === 0) continue;
+            const pct = Math.round((count / total) * 100);
+            html += `
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="fw-semibold">${planNames[key] || key}</small>
+                        <small class="text-muted">${count} usuario${count !== 1 ? 's' : ''}</small>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-${planColors[key] || 'secondary'}" style="width: ${pct}%"></div>
+                    </div>
+                </div>`;
+        }
+
+        if (trialsActive > 0 || trialsExpired > 0) {
+            html += `
+                <hr>
+                <div class="d-flex justify-content-between small">
+                    <span><i class="bi bi-clock me-1"></i>Trials activos</span>
+                    <span class="fw-semibold">${trialsActive}</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span><i class="bi bi-clock-history me-1"></i>Trials expirados</span>
+                    <span class="fw-semibold">${trialsExpired}</span>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    },
+
+    async loadChecksHistory() {
+        const { collection, getDocs, query, orderBy, limit } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        try {
+            const q = query(collection(db, 'systemChecks'), orderBy('timestamp', 'desc'), limit(10));
+            const snapshot = await getDocs(q);
+
+            const container = document.getElementById('systemChecksHistory');
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="text-center text-muted py-4">Sin controles anteriores</div>';
+                return;
+            }
+
+            container.innerHTML = snapshot.docs.map((doc) => {
+                const check = doc.data();
+                const date = new Date(check.timestamp);
+                const dateStr = date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                const allOk = check.checks && check.checks.every(c => c.status === 'ok');
+                const statusBadge = allOk ? '<span class="badge bg-success">OK</span>' : '<span class="badge bg-warning">Con alertas</span>';
+
+                return `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="fw-semibold">${dateStr}</span>
+                            <span class="ms-2">${statusBadge}</span>
+                        </div>
+                        <small class="text-muted">${check.totalUsers || 0} usuarios · ${check.totalPatients || 0} pacientes · ${check.totalAppointments || 0} turnos</small>
+                    </div>`;
+            }).join('');
+        } catch (err) {
+            console.error('[Admin] Load checks history error:', err);
+        }
+    },
+
+    async loadSystemCheck() {
+        const { collection, getDocs, query, orderBy, limit } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        try {
+            const q = query(collection(db, 'systemChecks'), orderBy('timestamp', 'desc'), limit(1));
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                const lastCheck = snapshot.docs[0].data();
+                const date = new Date(lastCheck.timestamp);
+                const dateStr = date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                document.getElementById('lastCheckTime').textContent = dateStr;
+            }
+
+            this.loadChecksHistory();
+        } catch (err) {
+            console.error('[Admin] Load system check error:', err);
         }
     }
 };

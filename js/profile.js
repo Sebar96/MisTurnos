@@ -36,6 +36,17 @@ const Profile = {
             document.getElementById('profileNameDisplay').textContent = profile.name || user.name;
             document.getElementById('profileSpecialtyDisplay').textContent = profile.specialty || user.specialty;
 
+            const planBadge = document.getElementById('profilePlanDisplay');
+            if (planBadge) {
+                const currentPlan = await Billing.getCurrentPlan(uid);
+                const planDetails = Billing.plans[currentPlan.planId];
+                if (planDetails) {
+                    planBadge.textContent = planDetails.name;
+                    const colors = { basic: 'secondary', professional: 'primary', clinic: 'success' };
+                    planBadge.className = `badge bg-${colors[currentPlan.planId] || 'secondary'} ms-2`;
+                }
+            }
+
             this.updateMapPreview(profile.mapUrl || '');
         } catch (err) {
             console.error('[Profile] Error loading:', err);
