@@ -85,6 +85,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="App.navigate('profile')"><i class="bi bi-gear me-2"></i>Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="Billing.showCurrentPlan()"><i class="bi bi-credit-card me-2"></i>Mi Plan</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" onclick="App.exportData()"><i class="bi bi-download me-2"></i>Exportar Datos</a></li>
                             <li>
@@ -93,6 +94,8 @@
                                     <input type="file" accept=".json" onchange="App.importData(event)" style="display:none">
                                 </label>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="App.showReportErrorModal()"><i class="bi bi-bug me-2"></i>Reportar Errores</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="#" onclick="Auth.logout()"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
                         </ul>
@@ -452,6 +455,12 @@
                                     </div>
                                     <h5 id="profileNameDisplay" class="fw-bold"></h5>
                                     <span class="badge bg-primary" id="profileSpecialtyDisplay"></span>
+                                    <span class="badge bg-secondary ms-2" id="profilePlanDisplay"></span>
+                                    <div class="mt-2">
+                                        <a href="#" class="text-decoration-none small" onclick="Billing.showCurrentPlan(); return false;">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Cambiar plan
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <form onsubmit="Profile.save(event)">
@@ -584,6 +593,11 @@
                             <i class="bi bi-exclamation-triangle me-1"></i>Errores
                         </button>
                     </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="Admin.showTab('controls')" data-admin-tab="controls">
+                            <i class="bi bi-heart-pulse me-1"></i>Controles
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Tab: Reciente -->
@@ -633,6 +647,57 @@
                         <div class="card-body">
                             <div id="adminErrorsList" class="table-responsive">
                                 <div class="text-center text-muted py-4">Cargando...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Controles -->
+                <div id="adminTab-controls" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1">Estado del Sistema</h5>
+                            <p class="text-muted small mb-0">Última verificación: <span id="lastCheckTime">Nunca</span></p>
+                        </div>
+                        <button class="btn btn-primary" onclick="Admin.runSystemCheck()">
+                            <i class="bi bi-arrow-repeat me-1"></i>Ejecutar controles
+                        </button>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent">
+                                    <h6 class="fw-bold mb-0"><i class="bi bi-heart-pulse me-2"></i>Salud del Sistema</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="systemHealthList">
+                                        <div class="text-center text-muted py-4">Hacé click en "Ejecutar controles" para verificar</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent">
+                                    <h6 class="fw-bold mb-0"><i class="bi bi-pie-chart me-2"></i>Distribución de Planes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="planDistribution">
+                                        <div class="text-center text-muted py-4">Sin datos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-header bg-transparent">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Historial de Controles</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="systemChecksHistory">
+                                <div class="text-center text-muted py-4">Sin controles anteriores</div>
                             </div>
                         </div>
                     </div>
@@ -695,14 +760,14 @@
         window.firebaseExports = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot };
     </script>
     <!-- Nuestros scripts (el orden importa) -->
-    <script src="js/app.js?v=5"></script>
-    <script src="js/auth.js?v=5"></script>
-    <script src="js/patients.js?v=5"></script>
-    <script src="js/appointments.js?v=5"></script>
-    <script src="js/profile.js?v=4"></script>
+    <script src="js/app.js?v=7"></script>
+    <script src="js/auth.js?v=6"></script>
+    <script src="js/patients.js?v=6"></script>
+    <script src="js/appointments.js?v=6"></script>
+    <script src="js/profile.js?v=5"></script>
     <script src="js/messages.js?v=1"></script>
     <script src="js/monitor.js?v=1"></script>
-    <script src="js/billing.js?v=1"></script>
-    <script src="js/admin.js?v=1"></script>
+    <script src="js/billing.js?v=6"></script>
+    <script src="js/admin.js?v=2"></script>
 </body>
 </html>
