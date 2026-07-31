@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * MONITOR.JS - Sistema de monitoreo y alertas
  */
 
@@ -105,7 +108,12 @@ const Monitor = {
 
 // Interceptar errores globales
 window.addEventListener('error', (event) => {
-    Monitor.logError('JavaScript Error', event.message, {
+    // Ignorar errores cross-origin genéricos ("Script error") del SDK Firebase
+    const msg = event.message || '';
+    if (msg === 'Script error.' && (!event.filename || event.filename.includes('gstatic.com'))) {
+        return;
+    }
+    Monitor.logError('JavaScript Error', msg || 'Unknown error', {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno
@@ -113,5 +121,8 @@ window.addEventListener('error', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    Monitor.logError('Unhandled Promise Rejection', event.reason?.message || 'Unknown error');
+    const reason = event.reason;
+    const msg = (reason && reason.message) ? reason.message : (typeof reason === 'string' ? reason : '');
+    if (!msg || msg.includes('firebase') || msg.includes('Firebase')) return;
+    Monitor.logError('Unhandled Promise Rejection', msg || 'Unknown error');
 });

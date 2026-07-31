@@ -1,3 +1,10 @@
+/*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
+ * ADMIN.JS - Panel de administración
+ */
+
 const Admin = {
 
     async loadDashboard() {
