@@ -19,8 +19,7 @@ const Billing = {
                 '1 usuario',
                 'Hasta 25 pacientes',
                 'Turnos ilimitados',
-                'WhatsApp manual',
-                'Modo oscuro/claro'
+                'WhatsApp manual'
             ]
         },
         professional: {
