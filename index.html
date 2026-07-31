@@ -85,7 +85,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="App.navigate('profile')"><i class="bi bi-gear me-2"></i>Mi Perfil</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="Billing.showCurrentPlan()"><i class="bi bi-credit-card me-2"></i>Mi Plan</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="if(typeof Billing!=='undefined') Billing.showCurrentPlan()"><i class="bi bi-credit-card me-2"></i>Mi Plan</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" onclick="App.exportData()"><i class="bi bi-download me-2"></i>Exportar Datos</a></li>
                             <li>
@@ -212,6 +212,11 @@
                                 <button type="submit" class="btn btn-success w-100 btn-lg">
                                     <i class="bi bi-person-plus me-2"></i>Crear Cuenta
                                 </button>
+                                <p class="text-muted small mt-3 text-center">
+                                    Al registrarte aceptás nuestros 
+                                    <a href="terms.html" class="text-decoration-none">Términos y Condiciones</a> y 
+                                    <a href="privacy.html" class="text-decoration-none">Política de Privacidad</a>.
+                                </p>
                             </form>
                         </div>
                     </div>
@@ -457,7 +462,7 @@
                                     <span class="badge bg-primary" id="profileSpecialtyDisplay"></span>
                                     <span class="badge bg-secondary ms-2" id="profilePlanDisplay"></span>
                                     <div class="mt-2">
-                                        <a href="#" class="text-decoration-none small" onclick="Billing.showCurrentPlan(); return false;">
+                                        <a href="#" class="text-decoration-none small" onclick="if(typeof Billing!=='undefined') Billing.showCurrentPlan(); return false;">
                                             <i class="bi bi-arrow-repeat me-1"></i>Cambiar plan
                                         </a>
                                     </div>
@@ -707,6 +712,14 @@
 
     </main>
 
+    <!-- Footer -->
+    <footer id="appFooter" class="text-center text-muted py-3 border-top d-none" style="border-color: var(--border-color) !important; background-color: var(--bg-body);">
+        <small>© 2026 Sebastián Russo · MisTurnos · 
+            <a href="terms.html" class="text-decoration-none">Términos</a> · 
+            <a href="privacy.html" class="text-decoration-none">Privacidad</a>
+        </small>
+    </footer>
+
     <!-- ============================================================
          MODAL GENÉRICO
          Se usa para crear/editar pacientes y turnos.
@@ -766,8 +779,8 @@
     <script src="js/appointments.js?v=6"></script>
     <script src="js/profile.js?v=5"></script>
     <script src="js/messages.js?v=1"></script>
-    <script src="js/monitor.js?v=1"></script>
-    <script src="js/billing.js?v=6"></script>
-    <script src="js/admin.js?v=2"></script>
+    <script src="js/monitor.js?v=3"></script>
+    <script src="js/billing.js?v=7"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 </html>
