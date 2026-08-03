@@ -6,81 +6,162 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Términos y Condiciones - MisTurnos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="css/landing.css" rel="stylesheet">
 </head>
 <body>
+    <nav class="landing-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="landing.html" class="logo">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>MisTurnos</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
+                <button class="btn btn-sm btn-outline-secondary fw-bold" id="langToggle" onclick="toggleLang()">EN</button>
+                <a href="index.html" class="btn btn-sm btn-primary">Iniciar sesión</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container py-5 mt-4">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <h1 class="fw-bold mb-2">Términos y Condiciones</h1>
-                <p class="text-muted mb-4">Última actualización: 30 de julio de 2026</p>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
+                <!-- ESPAÑOL -->
+                <div id="lang-es">
+                    <h1 class="fw-bold mb-2">Términos y Condiciones</h1>
+                    <p class="text-muted mb-4">Última actualización: 30 de julio de 2026</p>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mt-4">1. Aceptación de los Términos</h5>
+                            <p>Al acceder, registrarse o utilizar MisTurnos (en adelante, "el Servicio"), el usuario acepta quedar vinculado por los presentes Términos y Condiciones. Si no está de acuerdo, no debe utilizar el Servicio.</p>
 
-                        <h5 class="fw-bold mt-4">1. Aceptación de los Términos</h5>
-                        <p>Al acceder, registrarse o utilizar MisTurnos (en adelante, "el Servicio"), el usuario acepta quedar vinculado por los presentes Términos y Condiciones. Si no está de acuerdo, no debe utilizar el Servicio.</p>
+                            <h5 class="fw-bold mt-4">2. Descripción del Servicio</h5>
+                            <p>MisTurnos es una aplicación web (PWA) diseñada para la gestión de turnos y pacientes por parte de profesionales de la salud y otros profesionales que trabajan con turnos. El Servicio incluye:</p>
+                            <ul>
+                                <li>Gestión de pacientes (fichas de contacto e información médica)</li>
+                                <li>Gestión de turnos (creación, confirmación, cancelación)</li>
+                                <li>Recordatorios por WhatsApp (función manual)</li>
+                                <li>Panel de administración</li>
+                            </ul>
 
-                        <h5 class="fw-bold mt-4">2. Descripción del Servicio</h5>
-                        <p>MisTurnos es una aplicación web (PWA) diseñada para la gestión de turnos y pacientes por parte de profesionales de la salud y otros profesionales que trabajan con turnos. El Servicio incluye:</p>
-                        <ul>
-                            <li>Gestión de pacientes (fichas de contacto e información médica)</li>
-                            <li>Gestión de turnos (creación, confirmación, cancelación)</li>
-                            <li>Recordatorios por WhatsApp (función manual)</li>
-                            <li>Panel de administración</li>
-                        </ul>
+                            <h5 class="fw-bold mt-4">3. Cuenta de Usuario</h5>
+                            <p>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso. Cada cuenta es personal e intransferible. El usuario se compromete a:</p>
+                            <ul>
+                                <li>Proporcionar información veraz y actualizada</li>
+                                <li>No compartir su cuenta con terceros</li>
+                                <li>Notificar cualquier uso no autorizado de su cuenta</li>
+                            </ul>
 
-                        <h5 class="fw-bold mt-4">3. Cuenta de Usuario</h5>
-                        <p>El usuario es responsable de mantener la confidencialidad de sus credenciales de acceso. Cada cuenta es personal e intransferible. El usuario se compromete a:</p>
-                        <ul>
-                            <li>Proporcionar información veraz y actualizada</li>
-                            <li>No compartir su cuenta con terceros</li>
-                            <li>Notificar cualquier uso no autorizado de su cuenta</li>
-                        </ul>
+                            <h5 class="fw-bold mt-4">4. Propiedad Intelectual</h5>
+                            <p>MisTurnos es propiedad exclusiva de Sebastián Russo. Queda prohibida su reproducción total o parcial, distribución, modificación o cualquier forma de explotación sin autorización expresa por escrito.</p>
+                            <p>El código fuente, diseño, interfaces, bases de datos y contenidos están protegidos por las leyes de propiedad intelectual de la República Argentina.</p>
 
-                        <h5 class="fw-bold mt-4">4. Propiedad Intelectual</h5>
-                        <p>MisTurnos es propiedad exclusiva de Sebastián Russo. Queda prohibida su reproducción total o parcial, distribución, modificación o cualquier forma de explotación sin autorización expresa por escrito.</p>
-                        <p>El código fuente, diseño, interfaces, bases de datos y contenidos están protegidos por las leyes de propiedad intelectual de la República Argentina.</p>
+                            <h5 class="fw-bold mt-4">5. Datos del Usuario</h5>
+                            <p>Los datos personales se recopilan y procesan conforme a nuestra <a href="privacy.html">Política de Privacidad</a> y la Ley N° 25.326 de Protección de Datos Personales. El usuario es responsable de la información que carga en el Servicio.</p>
 
-                        <h5 class="fw-bold mt-4">5. Datos del Usuario</h5>
-                        <p>Los datos personales se recopilan y procesan conforme a nuestra <a href="privacy.html">Política de Privacidad</a> y la Ley N° 25.326 de Protección de Datos Personales. El usuario es responsable de la información que carga en el Servicio.</p>
+                            <h5 class="fw-bold mt-4">6. Información Médica</h5>
+                            <p><strong>AVISO IMPORTANTE:</strong> MisTurnos NO es un sistema de historia clínica ni un dispositivo médico. La información médica que el profesional cargue es bajo su exclusiva responsabilidad.</p>
+                            <p>MisTurnos no reemplaza el criterio médico, ni el registro oficial de pacientes, ni constituye asesoramiento médico de ningún tipo.</p>
 
-                        <h5 class="fw-bold mt-4">6. Información Médica</h5>
-                        <p><strong>AVISO IMPORTANTE:</strong> MisTurnos NO es un sistema de historia clínica ni un dispositivo médico. La información médica que el profesional cargue es bajo su exclusiva responsabilidad.</p>
-                        <p>MisTurnos no reemplaza el criterio médico, ni el registro oficial de pacientes, ni constituye asesoramiento médico de ningún tipo.</p>
+                            <h5 class="fw-bold mt-4">7. Limitación de Responsabilidad</h5>
+                            <p>MisTurnos se proporciona "tal cual" sin garantías de ningún tipo. En ningún caso será responsable por:</p>
+                            <ul>
+                                <li>Pérdida de datos</li>
+                                <li>Interrupciones del servicio</li>
+                                <li>Daños directos o indirectos</li>
+                                <li>Uso indebido de la información</li>
+                            </ul>
 
-                        <h5 class="fw-bold mt-4">7. Limitación de Responsabilidad</h5>
-                        <p>MisTurnos se proporciona "tal cual" sin garantías de ningún tipo. En ningún caso será responsable por:</p>
-                        <ul>
-                            <li>Pérdida de datos</li>
-                            <li>Interrupciones del servicio</li>
-                            <li>Daños directos o indirectos</li>
-                            <li>Uso indebido de la información</li>
-                        </ul>
+                            <h5 class="fw-bold mt-4">8. Cancelación</h5>
+                            <p>El usuario puede cancelar su cuenta en cualquier momento desde la configuración de su perfil. La cancelación no genera reembolso del período facturado.</p>
+                            <p>MisTurnos se reserva el derecho de cancelar cuentas que violen estos términos.</p>
 
-                        <h5 class="fw-bold mt-4">8. Cancelación</h5>
-                        <p>El usuario puede cancelar su cuenta en cualquier momento desde la configuración de su perfil. La cancelación no genera reembolso del período facturado.</p>
-                        <p>MisTurnos se reserva el derecho de cancelar cuentas que violen estos términos.</p>
+                            <h5 class="fw-bold mt-4">9. Modificaciones</h5>
+                            <p>MisTurnos se reserva el derecho de modificar estos términos en cualquier momento. Las modificaciones serán efectivas desde su publicación. El uso continuado del Servicio implica la aceptación de los cambios.</p>
 
-                        <h5 class="fw-bold mt-4">9. Modificaciones</h5>
-                        <p>MisTurnos se reserva el derecho de modificar estos términos en cualquier momento. Las modificaciones serán efectivas desde su publicación. El uso continuado del Servicio implica la aceptación de los cambios.</p>
+                            <h5 class="fw-bold mt-4">10. Ley Aplicable y Jurisdicción</h5>
+                            <p>Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia será sometida a la jurisdicción de los Tribunales Ordinarios de la Ciudad de Buenos Aires.</p>
 
-                        <h5 class="fw-bold mt-4">10. Ley Aplicable y Jurisdicción</h5>
-                        <p>Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia será sometida a la jurisdicción de los Tribunales Ordinarios de la Ciudad de Buenos Aires.</p>
+                            <h5 class="fw-bold mt-4">11. Contacto</h5>
+                            <p>Para consultas sobre estos términos:</p>
+                            <ul>
+                                <li>Email: sebarusso96@gmail.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
-                        <h5 class="fw-bold mt-4">11. Contacto</h5>
-                        <p>Para consultas sobre estos términos:</p>
-                        <ul>
-                            <li>Email: sebarusso96@gmail.com</li>
-                        </ul>
+                <!-- ENGLISH -->
+                <div id="lang-en" class="d-none">
+                    <h1 class="fw-bold mb-2">Terms and Conditions</h1>
+                    <p class="text-muted mb-4">Last updated: July 30, 2026</p>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mt-4">1. Acceptance of Terms</h5>
+                            <p>By accessing, registering or using MisTurnos (hereinafter, "the Service"), the user agrees to be bound by these Terms and Conditions. If you do not agree, you must not use the Service.</p>
 
+                            <h5 class="fw-bold mt-4">2. Description of the Service</h5>
+                            <p>MisTurnos is a web application (PWA) designed for appointment and patient management by healthcare professionals and other professionals who work with appointments. The Service includes:</p>
+                            <ul>
+                                <li>Patient management (contact files and medical information)</li>
+                                <li>Appointment management (creation, confirmation, cancellation)</li>
+                                <li>WhatsApp reminders (manual function)</li>
+                                <li>Administration panel</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">3. User Account</h5>
+                            <p>The user is responsible for maintaining the confidentiality of their login credentials. Each account is personal and non-transferable. The user agrees to:</p>
+                            <ul>
+                                <li>Provide truthful and updated information</li>
+                                <li>Not share their account with third parties</li>
+                                <li>Notify any unauthorized use of their account</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">4. Intellectual Property</h5>
+                            <p>MisTurnos is the exclusive property of Sebastián Russo. Total or partial reproduction, distribution, modification or any form of exploitation without express written authorization is prohibited.</p>
+                            <p>The source code, design, interfaces, databases and contents are protected by the intellectual property laws of the Argentine Republic.</p>
+
+                            <h5 class="fw-bold mt-4">5. User Data</h5>
+                            <p>Personal data is collected and processed in accordance with our <a href="privacy.html">Privacy Policy</a> and Law No. 25.326 on Personal Data Protection. The user is responsible for the information they upload to the Service.</p>
+
+                            <h5 class="fw-bold mt-4">6. Medical Information</h5>
+                            <p><strong>IMPORTANT NOTICE:</strong> MisTurnos is NOT a medical history system or a medical device. The medical information that the professional uploads is under their sole responsibility.</p>
+                            <p>MisTurnos does not replace medical criteria, nor official patient records, nor constitutes medical advice of any kind.</p>
+
+                            <h5 class="fw-bold mt-4">7. Limitation of Liability</h5>
+                            <p>MisTurnos is provided "as is" without warranties of any kind. In no event shall it be liable for:</p>
+                            <ul>
+                                <li>Data loss</li>
+                                <li>Service interruptions</li>
+                                <li>Direct or indirect damages</li>
+                                <li>Misuse of information</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">8. Cancellation</h5>
+                            <p>The user may cancel their account at any time from their profile settings. Cancellation does not generate a refund for the billed period.</p>
+                            <p>MisTurnos reserves the right to cancel accounts that violate these terms.</p>
+
+                            <h5 class="fw-bold mt-4">9. Modifications</h5>
+                            <p>MisTurnos reserves the right to modify these terms at any time. Modifications will be effective from the date of publication. Continued use of the Service implies acceptance of the changes.</p>
+
+                            <h5 class="fw-bold mt-4">10. Applicable Law and Jurisdiction</h5>
+                            <p>These terms are governed by the laws of the Argentine Republic. Any dispute shall be submitted to the jurisdiction of the Ordinary Courts of the City of Buenos Aires.</p>
+
+                            <h5 class="fw-bold mt-4">11. Contact</h5>
+                            <p>For inquiries about these terms:</p>
+                            <ul>
+                                <li>Email: sebarusso96@gmail.com</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
                 <div class="text-center mt-4">
                     <a href="index.html" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-left me-1"></i>Volver a MisTurnos
+                        <i class="bi bi-arrow-left me-1"></i><span id="backText">Volver a MisTurnos</span>
                     </a>
                 </div>
             </div>
@@ -93,5 +174,39 @@
             <a href="privacy.html" class="text-decoration-none">Privacidad</a>
         </small>
     </footer>
+
+    <script>
+        const esTexts = { back: 'Volver a MisTurnos', login: 'Iniciar sesión' };
+        const enTexts = { back: 'Back to MisTurnos', login: 'Log in' };
+
+        function getLang() { return localStorage.getItem('lang') || 'es'; }
+
+        function applyLang() {
+            const lang = getLang();
+            document.getElementById('lang-es').classList.toggle('d-none', lang !== 'es');
+            document.getElementById('lang-en').classList.toggle('d-none', lang !== 'en');
+            document.getElementById('langToggle').textContent = lang === 'es' ? 'EN' : 'ES';
+            document.getElementById('backText').textContent = lang === 'es' ? esTexts.back : enTexts.back;
+            document.documentElement.lang = lang;
+        }
+
+        function toggleLang() {
+            localStorage.setItem('lang', getLang() === 'es' ? 'en' : 'es');
+            applyLang();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-bs-theme', saved);
+            applyLang();
+        })();
+    </script>
 </body>
 </html>
