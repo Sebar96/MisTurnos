@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * APP.JS - LÓGICA PRINCIPAL DE MisTurnos
  */
 
@@ -737,5 +740,6 @@ const App = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    I18n.init();
     App.init();
 });
