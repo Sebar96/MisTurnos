@@ -740,6 +740,6 @@ const App = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    I18n.init();
+    if (typeof I18n !== 'undefined') I18n.init();
     App.init();
 });
