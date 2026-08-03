@@ -11,8 +11,8 @@ const Billing = {
         basic: {
             id: 'basic',
             name: 'Básico',
-            price: 4000,
-            priceUSD: 4,
+            price: 5000,
+            priceUSD: 5,
             maxPatients: 25,
             maxUsers: 1,
             features: [
@@ -25,8 +25,8 @@ const Billing = {
         professional: {
             id: 'professional',
             name: 'Profesional',
-            price: 8000,
-            priceUSD: 8,
+            price: 10000,
+            priceUSD: 10,
             maxPatients: 50,
             maxUsers: 2,
             features: [
@@ -40,8 +40,8 @@ const Billing = {
         clinic: {
             id: 'clinic',
             name: 'Consultorio',
-            price: 12000,
-            priceUSD: 12,
+            price: 15000,
+            priceUSD: 15,
             maxPatients: -1,
             maxUsers: 3,
             features: [

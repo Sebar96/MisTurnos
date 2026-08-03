@@ -169,6 +169,7 @@ const I18n = {
 
             // Common
             'common.loading': 'Cargando...',
+            'common.loading': 'Cargando...',
             'common.cancel': 'Cancelar',
             'common.save': 'Guardar',
             'common.delete': 'Eliminar',
