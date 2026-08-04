@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * AUTH.JS - Firebase Authentication
  */
 
@@ -59,6 +62,7 @@ const Auth = {
     showApp(user) {
         document.getElementById('page-login').classList.add('d-none');
         document.getElementById('navbar').classList.remove('d-none');
+        document.getElementById('appFooter').classList.remove('d-none');
         document.getElementById('navUserName').textContent = user.name || user.email || 'Usuario';
 
         const adminItem = document.getElementById('navAdminItem');
@@ -80,6 +84,7 @@ const Auth = {
             if (s.id !== 'page-login') s.classList.add('d-none');
         });
         document.getElementById('navbar').classList.add('d-none');
+        document.getElementById('appFooter').classList.add('d-none');
     },
 
     async login(event) {
@@ -180,12 +185,14 @@ const Auth = {
         }
     },
 
-    async logout() {
-        const confirmed = await App.confirmAction('¿Seguro que querés cerrar sesión?', {
-            confirmText: 'Cerrar sesión',
-            confirmColor: 'danger'
-        });
-        if (!confirmed) return;
+    async logout(forced = false) {
+        if (!forced) {
+            const confirmed = await App.confirmAction('¿Seguro que querés cerrar sesión?', {
+                confirmText: 'Cerrar sesión',
+                confirmColor: 'danger'
+            });
+            if (!confirmed) return;
+        }
 
         const { signOut } = window.firebaseExports;
         const auth = window.firebaseAuth;

@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * PATIENTS.JS - Firestore
  */
 
@@ -309,18 +312,18 @@ const Patients = {
         const uid = Auth.getUid();
 
         const data = {
-            name: document.getElementById('pName').value.trim(),
-            phone: document.getElementById('pPhone').value.trim(),
-            email: document.getElementById('pEmail').value.trim(),
-            insurance: document.getElementById('pInsurance').value.trim(),
+            name: App.sanitize(document.getElementById('pName').value.trim()),
+            phone: App.sanitize(document.getElementById('pPhone').value.trim()),
+            email: App.sanitize(document.getElementById('pEmail').value.trim()),
+            insurance: App.sanitize(document.getElementById('pInsurance').value.trim()),
             status: document.getElementById('pStatus').value,
-            reason: document.getElementById('pReason').value.trim(),
+            reason: App.sanitize(document.getElementById('pReason').value.trim()),
             cardiac: document.getElementById('pCardiac').value,
-            cardiacDetail: document.getElementById('pCardiacDetail').value.trim(),
-            diseases: document.getElementById('pDiseases').value.trim(),
-            allergies: document.getElementById('pAllergies').value.trim(),
-            medication: document.getElementById('pMedication').value.trim(),
-            observations: document.getElementById('pObservations').value.trim()
+            cardiacDetail: App.sanitize(document.getElementById('pCardiacDetail').value.trim()),
+            diseases: App.sanitize(document.getElementById('pDiseases').value.trim()),
+            allergies: App.sanitize(document.getElementById('pAllergies').value.trim()),
+            medication: App.sanitize(document.getElementById('pMedication').value.trim()),
+            observations: App.sanitize(document.getElementById('pObservations').value.trim())
         };
 
         if (!data.name || !data.phone) {

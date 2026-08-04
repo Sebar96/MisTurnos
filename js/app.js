@@ -39,12 +39,16 @@ const Cache = {
 
 const App = {
 
+    _lastActivity: Date.now(),
+    _sessionTimeout: 30 * 60 * 1000, // 30 minutos
+
     init() {
         console.log('[App] Inicializando MisTurnos...');
         this.registerServiceWorker();
         this.loadTheme();
         Auth.checkSession();
         this.setDefaultDates();
+        this.startSessionMonitor();
 
         window.addEventListener('hashchange', () => this.handleHashChange());
 
@@ -98,8 +102,44 @@ const App = {
     },
 
     applyUpdate() {
-        // Recargar la página con la nueva versión
         window.location.reload();
+    },
+
+    // ===================== SEGURIDAD =====================
+
+    startSessionMonitor() {
+        ['click', 'keydown', 'scroll', 'mousemove'].forEach((evt) => {
+            document.addEventListener(evt, () => { App._lastActivity = Date.now(); }, { passive: true });
+        });
+
+        setInterval(() => {
+            if (Auth.getUid() && (Date.now() - App._lastActivity > App._sessionTimeout)) {
+                Auth.logout(true);
+            }
+        }, 60000);
+    },
+
+    sanitize(str) {
+        if (typeof str !== 'string') return str;
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    },
+
+    async logActivity(action, details = '') {
+        if (!Auth.getUid()) return;
+        const { addDoc, collection } = window.firebaseExports;
+        const db = window.firebaseDB;
+        try {
+            await addDoc(collection(db, 'activityLog'), {
+                userId: Auth.getUid(),
+                userEmail: Auth.getCurrentUser()?.email || '',
+                action: action,
+                details: details,
+                timestamp: new Date().toISOString(),
+                ip: 'client'
+            });
+        } catch (e) { /* silent */ }
     },
 
     _navHistory: [],
@@ -704,6 +744,8 @@ const App = {
         modal.show();
     },
 
+    _lastErrorReport: 0,
+
     async submitErrorReport() {
         const desc = document.getElementById('reportErrorDesc').value.trim();
         const expected = document.getElementById('reportErrorExpected').value.trim();
@@ -714,6 +756,11 @@ const App = {
             return;
         }
 
+        if (Date.now() - this._lastErrorReport < 60000) {
+            this.showToast('Esperá un minuto antes de enviar otro reporte', 'warning');
+            return;
+        }
+
         const user = Auth.getCurrentUser();
         const { addDoc, collection } = window.firebaseExports;
         const db = window.firebaseDB;
@@ -721,8 +768,8 @@ const App = {
         try {
             await addDoc(collection(db, 'errors'), {
                 type: 'user_report',
-                message: desc,
-                expected: expected || '',
+                message: this.sanitize(desc),
+                expected: this.sanitize(expected || ''),
                 url: includeUrl ? window.location.href : '',
                 userEmail: user ? user.email : '',
                 userId: Auth.getUid() || '',
@@ -730,6 +777,7 @@ const App = {
                 createdAt: new Date().toISOString()
             });
 
+            this._lastErrorReport = Date.now();
             bootstrap.Modal.getInstance(document.getElementById('appModal')).hide();
             this.showToast('Reporte enviado. ¡Gracias!', 'success');
         } catch (err) {

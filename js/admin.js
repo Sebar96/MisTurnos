@@ -148,6 +148,7 @@ const Admin = {
 
         try {
             await deleteDoc(doc(db, 'users', userId));
+            App.logActivity('admin_delete_user', `Eliminó usuario: ${userName} (${userId})`);
             App.showToast(`${userName} eliminado`, 'success');
             this.loadUsers();
         } catch (err) {
@@ -228,6 +229,7 @@ const Admin = {
             const snapshot = await getDocs(collection(db, 'errors'));
             const deletes = snapshot.docs.map((d) => deleteDoc(doc(db, 'errors', d.id)));
             await Promise.all(deletes);
+            App.logActivity('admin_clear_errors', `Eliminó ${snapshot.size} errores`);
             App.showToast('Errores eliminados', 'success');
             this.loadErrors();
             this.loadDashboard();
