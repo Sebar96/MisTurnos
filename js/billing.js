@@ -7,7 +7,7 @@
 
 const Billing = {
 
-    API_URL: '/api',
+    API_URL: 'https://mis-turnos-api.vercel.app/api',
 
     plans: {
         basic: {
