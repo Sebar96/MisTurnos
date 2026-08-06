@@ -59,9 +59,9 @@ const Profile = {
     async save(event) {
         event.preventDefault();
 
-        const { doc, setDoc } = window.firebaseExports;
-        const db = window.firebaseDB;
-        const uid = Auth.getUid();
+        const { doc, setDoc, getDoc } = window.firebaseExports;
+                const db = window.firebaseDB;
+                const uid = Auth.getUid();
 
         const profile = {
             name: App.sanitize(document.getElementById('profileName').value.trim()),
