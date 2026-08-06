@@ -49,6 +49,7 @@ const App = {
         Auth.checkSession();
         this.setDefaultDates();
         this.startSessionMonitor();
+        this.handlePaymentCallback();
 
         window.addEventListener('hashchange', () => this.handleHashChange());
 
@@ -755,6 +756,33 @@ const App = {
     },
 
     _lastErrorReport: 0,
+
+    handlePaymentCallback() {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const collectionStatus = params.get('collection_status');
+        const planId = params.get('plan_id');
+        const userId = params.get('user_id');
+
+        if (status === 'approved' || collectionStatus === 'approved') {
+            if (planId && userId) {
+                Billing.handlePaymentSuccess(planId, userId).then(() => {
+                    this.showToast('¡Pago aprobado! Tu plan ha sido activado.', 'success');
+                    window.history.replaceState({}, '', window.location.pathname);
+                    setTimeout(() => this.navigate('dashboard'), 1500);
+                });
+            } else {
+                this.showToast('¡Pago aprobado! Recargá la página para ver los cambios.', 'success');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        } else if (status === 'failure' || collectionStatus === 'failure') {
+            this.showToast('El pago no pudo procesarse. Intentá de nuevo.', 'warning');
+            window.history.replaceState({}, '', window.location.pathname);
+        } else if (status === 'pending' || collectionStatus === 'pending') {
+            this.showToast('Tu pago está siendo procesado. Te notificaremos cuando se acredite.', 'info');
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    },
 
     async submitErrorReport() {
         const desc = document.getElementById('reportErrorDesc').value.trim();

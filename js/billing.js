@@ -7,6 +7,8 @@
 
 const Billing = {
 
+    API_URL: '/api',
+
     plans: {
         basic: {
             id: 'basic',
@@ -268,28 +270,55 @@ const Billing = {
         const user = Auth.getCurrentUser();
         if (!user) return;
 
-        const { doc, setDoc } = window.firebaseExports;
-        const db = window.firebaseDB;
-        const uid = Auth.getUid();
-
         const plan = this.plans[planId];
         if (!plan) return;
 
+        const uid = Auth.getUid();
+        const email = user.email || '';
+
         try {
-            await setDoc(doc(db, 'users', uid), {
+            App.showToast('Redirigiendo a Mercado Pago...', 'info');
+
+            const response = await fetch(`${this.API_URL}/create-checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    planId: planId,
+                    userId: uid,
+                    email: email
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.init_point) {
+                window.location.href = data.init_point;
+            } else {
+                App.showToast('Error al crear el checkout', 'danger');
+            }
+        } catch (err) {
+            console.error('[Billing] Error creating checkout:', err);
+            App.showToast('Error al conectar con el servidor de pagos', 'danger');
+        }
+    },
+
+    async handlePaymentSuccess(planId, userId) {
+        const { doc, setDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        try {
+            await setDoc(doc(db, 'users', userId), {
                 planId: planId,
                 planTrial: false,
                 planTrialExpiry: null,
                 subscriptionStatus: 'active',
+                paidAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             }, { merge: true });
 
-            App.showToast(`Plan ${plan.name} activado.`, 'success');
-
-            bootstrap.Modal.getInstance(document.getElementById('appModal')).hide();
+            console.log('[Billing] Plan updated after payment:', planId);
         } catch (err) {
-            console.error('[Billing] Error selecting plan:', err);
-            App.showToast('Error al seleccionar el plan', 'danger');
+            console.error('[Billing] Error updating plan:', err);
         }
     }
 };
