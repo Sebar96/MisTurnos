@@ -126,8 +126,8 @@ const Auth = {
         const auth = window.firebaseAuth;
         const db = window.firebaseDB;
 
-        const name = document.getElementById('regName').value.trim();
-        const specialty = document.getElementById('regSpecialty').value.trim();
+        const name = App.sanitize(document.getElementById('regName').value.trim());
+        const specialty = App.sanitize(document.getElementById('regSpecialty').value.trim());
         const email = document.getElementById('regEmail').value.trim().toLowerCase();
         const password = document.getElementById('regPassword').value;
         const passwordConfirm = document.getElementById('regPasswordConfirm').value;

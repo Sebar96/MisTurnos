@@ -97,7 +97,16 @@ const Patients = {
     },
 
     renderCard(patient) {
-        const initials = patient.name
+        const name = App.escapeHtml(patient.name || '');
+        const email = App.escapeHtml(patient.email || '');
+        const insurance = App.escapeHtml(patient.insurance || '');
+        const reason = App.escapeHtml(patient.reason || '');
+        const phone = App.escapeHtml(patient.phone || '');
+        const phoneAttr = App.escapeAttr(patient.phone || '');
+        const nameAttr = App.escapeAttr(patient.name || '');
+        const idAttr = App.escapeAttr(patient.id || '');
+
+        const initials = (patient.name || '')
             .split(' ')
             .filter((w) => w.length > 2)
             .map((w) => w[0])
@@ -110,33 +119,33 @@ const Patients = {
 
         return `
             <div class="col-sm-6 col-lg-4 col-xl-3">
-                <div class="card patient-card border-0 shadow-sm h-100" onclick="Patients.showDetail('${patient.id}')">
+                <div class="card patient-card border-0 shadow-sm h-100" onclick="Patients.showDetail('${idAttr}')">
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
                             <div class="patient-avatar me-3">${initials}</div>
                             <div class="flex-grow-1 min-width-0">
-                                <h6 class="card-title fw-bold mb-0 text-truncate" title="${patient.name}">
-                                    ${patient.name}
+                                <h6 class="card-title fw-bold mb-0 text-truncate" title="${nameAttr}">
+                                    ${name}
                                 </h6>
-                                <small class="text-muted">${patient.email || 'Sin email'}</small>
+                                <small class="text-muted">${email || 'Sin email'}</small>
                                 <div class="mt-1">
                                     <span class="badge ${statusClass}">${statusText}</span>
-                                    ${patient.insurance ? `<span class="badge bg-light text-dark">${patient.insurance}</span>` : ''}
+                                    ${insurance ? `<span class="badge bg-light text-dark">${insurance}</span>` : ''}
                                 </div>
                             </div>
                         </div>
-                        ${patient.reason ? `<p class="small text-muted mb-3 text-truncate"><i class="bi bi-chat-dots me-1"></i>${patient.reason}</p>` : ''}
-                        ${patient.phone ? `<p class="small mb-3"><i class="bi bi-telephone me-1 text-primary"></i>${patient.phone}</p>` : ''}
+                        ${reason ? `<p class="small text-muted mb-3 text-truncate"><i class="bi bi-chat-dots me-1"></i>${reason}</p>` : ''}
+                        ${phone ? `<p class="small mb-3"><i class="bi bi-telephone me-1 text-primary"></i>${phone}</p>` : ''}
                         <div class="d-flex gap-2 flex-wrap" onclick="event.stopPropagation()">
                             ${patient.phone ? `
-                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="event.stopPropagation(); App.openWhatsApp('${patient.phone}', 'Hola ${patient.name}, le escribimos desde MisTurnos.')">
+                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="event.stopPropagation(); App.openWhatsApp('${phoneAttr}', 'Hola ${nameAttr}, le escribimos desde MisTurnos.')">
                                     <i class="bi bi-whatsapp"></i>
                                 </button>
                             ` : ''}
-                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="event.stopPropagation(); Appointments.showModal(null, '${patient.id}')">
+                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="event.stopPropagation(); Appointments.showModal(null, '${idAttr}')">
                                 <i class="bi bi-calendar-plus"></i>
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="event.stopPropagation(); Patients.showModal('${patient.id}')">
+                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="event.stopPropagation(); Patients.showModal('${idAttr}')">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="event.stopPropagation(); Patients.delete('${patient.id}', '${patient.name.replace(/'/g, "\\'")}')">
@@ -371,8 +380,8 @@ const Patients = {
         const db = window.firebaseDB;
         const uid = Auth.getUid();
 
-        const name = document.getElementById('qcName').value.trim();
-        const phone = document.getElementById('qcPhone').value.trim();
+        const name = App.sanitize(document.getElementById('qcName').value.trim());
+        const phone = App.sanitize(document.getElementById('qcPhone').value.trim());
 
         if (!name || !phone) {
             App.showToast('Nombre y teléfono son obligatorios', 'warning');
@@ -494,7 +503,7 @@ const Patients = {
             return `
                 <div class="detail-info-row">
                     <span class="detail-info-label"><i class="bi ${icon} me-1"></i>${label}</span>
-                    <span class="detail-info-value">${value}</span>
+                    <span class="detail-info-value">${App.escapeHtml(value)}</span>
                 </div>`;
         };
 
@@ -513,7 +522,7 @@ const Patients = {
                         <div>
                             <span class="fw-semibold">${App.formatDateShort(a.date)}</span>
                             <span class="ms-2 text-muted">${a.time}</span>
-                            ${a.reason ? `<span class="ms-2 small text-muted">${a.reason}</span>` : ''}
+                            ${a.reason ? `<span class="ms-2 small text-muted">${App.escapeHtml(a.reason)}</span>` : ''}
                         </div>
                         ${statusBadge}
                     </div>`;
@@ -530,9 +539,9 @@ const Patients = {
             <div class="detail-header">
                 <div class="detail-avatar">${initials}</div>
                 <div class="flex-grow-1">
-                    <h3 class="fw-bold mb-1">${patient.name}</h3>
+                    <h3 class="fw-bold mb-1">${App.escapeHtml(patient.name)}</h3>
                     <span class="badge ${statusClass}">${statusText}</span>
-                    ${patient.insurance ? `<span class="badge bg-light text-dark ms-1">${patient.insurance}</span>` : ''}
+                    ${patient.insurance ? `<span class="badge bg-light text-dark ms-1">${App.escapeHtml(patient.insurance)}</span>` : ''}
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary btn-sm" onclick="Appointments.showModal(null, '${patient.id}')">

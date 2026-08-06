@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * PROFILE.JS - Firestore
  */
 
@@ -61,15 +64,15 @@ const Profile = {
         const uid = Auth.getUid();
 
         const profile = {
-            name: document.getElementById('profileName').value.trim(),
-            specialty: document.getElementById('profileSpecialty').value.trim(),
+            name: App.sanitize(document.getElementById('profileName').value.trim()),
+            specialty: App.sanitize(document.getElementById('profileSpecialty').value.trim()),
             email: document.getElementById('profileEmail').value.trim(),
-            phone: document.getElementById('profilePhone').value.trim(),
-            address: document.getElementById('profileAddress').value.trim(),
+            phone: App.sanitize(document.getElementById('profilePhone').value.trim()),
+            address: App.sanitize(document.getElementById('profileAddress').value.trim()),
             mapUrl: document.getElementById('profileMapUrl').value.trim(),
-            instagram: document.getElementById('profileInstagram').value.trim(),
-            facebook: document.getElementById('profileFacebook').value.trim(),
-            linkedin: document.getElementById('profileLinkedIn').value.trim()
+            instagram: App.sanitize(document.getElementById('profileInstagram').value.trim()),
+            facebook: App.sanitize(document.getElementById('profileFacebook').value.trim()),
+            linkedin: App.sanitize(document.getElementById('profileLinkedIn').value.trim())
         };
 
         try {

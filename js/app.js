@@ -126,6 +126,16 @@ const App = {
         return div.innerHTML;
     },
 
+    escapeHtml(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    },
+
+    escapeAttr(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
+
     async logActivity(action, details = '') {
         if (!Auth.getUid()) return;
         const { addDoc, collection } = window.firebaseExports;

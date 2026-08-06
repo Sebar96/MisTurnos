@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * APPOINTMENTS.JS - Firestore
  */
 
@@ -76,8 +79,13 @@ const Appointments = {
 
         let html = pageAppointments.map((appt) => {
             const patient = patients.find((p) => p.id === appt.patientId);
-            const patientName = patient ? patient.name : 'Paciente eliminado';
+            const patientName = App.escapeHtml(patient ? patient.name : 'Paciente eliminado');
             const patientPhone = patient ? patient.phone : '';
+            const patientPhoneAttr = App.escapeAttr(patientPhone);
+            const patientNameAttr = App.escapeAttr(patient ? patient.name : '');
+            const apptReason = App.escapeHtml(appt.reason || '');
+            const apptNotes = App.escapeHtml(appt.notes || '');
+            const apptIdAttr = App.escapeAttr(appt.id);
 
             const apptDate = new Date(appt.date + 'T' + appt.time);
             const isPast = apptDate < new Date();
@@ -100,8 +108,8 @@ const Appointments = {
                                 <i class="bi bi-person me-1"></i>
                                 <span class="fw-semibold">${patientName}</span>
                             </div>
-                            ${appt.reason ? `<small class="text-muted"><i class="bi bi-chat-dots me-1"></i>${appt.reason}</small>` : ''}
-                            ${appt.notes ? `<small class="text-muted d-block"><i class="bi bi-sticky me-1"></i>${appt.notes}</small>` : ''}
+                            ${apptReason ? `<small class="text-muted"><i class="bi bi-chat-dots me-1"></i>${apptReason}</small>` : ''}
+                            ${apptNotes ? `<small class="text-muted d-block"><i class="bi bi-sticky me-1"></i>${apptNotes}</small>` : ''}
                         </div>
                         <div class="d-flex flex-column align-items-end gap-2">
                             <span class="badge badge-status badge-${appt.status}">
@@ -110,35 +118,35 @@ const Appointments = {
                             <div class="d-flex gap-1 flex-wrap justify-content-end">
                                 ${patientPhone ? `
                                     <button class="btn btn-outline-success btn-sm" title="Mensajes WhatsApp"
-                                            onclick="Messages.showModal('${appt.id}')">
+                                            onclick="Messages.showModal('${apptIdAttr}')">
                                         <i class="bi bi-whatsapp"></i>
                                     </button>
                                 ` : ''}
                                 ${appt.status === 'scheduled' ? `
                                     <button class="btn btn-outline-success btn-sm" title="Confirmar"
-                                            onclick="Appointments.changeStatus('${appt.id}', 'confirmed')">
+                                            onclick="Appointments.changeStatus('${apptIdAttr}', 'confirmed')">
                                         <i class="bi bi-check-lg"></i>
                                     </button>
                                 ` : ''}
                                 ${appt.status === 'confirmed' ? `
                                     <button class="btn btn-outline-primary btn-sm" title="Marcar como realizado"
-                                            onclick="Appointments.changeStatus('${appt.id}', 'completed')">
+                                            onclick="Appointments.changeStatus('${apptIdAttr}', 'completed')">
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 ` : ''}
                                 ${canOperate ? `
                                     <button class="btn btn-outline-warning btn-sm" title="Reprogramar"
-                                            onclick="Appointments.showModal('${appt.id}', null, true)">
+                                            onclick="Appointments.showModal('${apptIdAttr}', null, true)">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
                                 ` : ''}
                                 <button class="btn btn-outline-secondary btn-sm" title="Editar"
-                                        onclick="Appointments.showModal('${appt.id}')">
+                                        onclick="Appointments.showModal('${apptIdAttr}')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 ${canOperate ? `
                                     <button class="btn btn-outline-danger btn-sm" title="Cancelar"
-                                            onclick="Appointments.cancel('${appt.id}')">
+                                            onclick="Appointments.cancel('${apptIdAttr}')">
                                         <i class="bi bi-x-lg"></i>
                                     </button>
                                 ` : ''}
@@ -526,8 +534,8 @@ const Appointments = {
             patientId: this._wizard.selectedPatientId,
             date: document.getElementById('aDate').value,
             time: document.getElementById('aTime').value,
-            reason: document.getElementById('aReason').value.trim(),
-            notes: document.getElementById('aNotes').value.trim()
+            reason: App.sanitize(document.getElementById('aReason').value.trim()),
+            notes: App.sanitize(document.getElementById('aNotes').value.trim())
         };
 
         const statusSelect = document.getElementById('aStatus');
