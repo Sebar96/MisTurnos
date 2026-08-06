@@ -284,8 +284,10 @@ const Billing = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId: planId,
+                    planName: plan.name,
+                    price: plan.price,
                     userId: uid,
-                    email: email
+                    userEmail: email
                 })
             });
 
