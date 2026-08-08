@@ -1,10 +1,10 @@
 /*
- * SERVICE WORKER v5 - MisTurnos
+ * SERVICE WORKER v6 - MisTurnos
  * Estrategia: Cache First para archivos estáticos, Network First para datos
  */
 
-const CACHE_NAME = 'misturnos-v5';
-const CACHE_STATIC = 'misturnos-static-v5';
+const CACHE_NAME = 'misturnos-v6';
+const CACHE_STATIC = 'misturnos-static-v6';
 const CACHE_FONTS = 'misturnos-fonts-v1';
 
 const STATIC_ASSETS = [

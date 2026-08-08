@@ -794,7 +794,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYwf6g6YUuqWvBiqnNqd9vCYNKi6oFSyc",
@@ -809,18 +809,18 @@
         window.firebaseApp = firebaseApp;
         window.firebaseAuth = getAuth(firebaseApp);
         window.firebaseDB = getFirestore(firebaseApp);
-        window.firebaseExports = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot };
+        window.firebaseExports = { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, query, where, onSnapshot, orderBy, limit };
     </script>
     <!-- Nuestros scripts (el orden importa) -->
     <script src="js/i18n.js?v=2"></script>
     <script src="js/app.js?v=10"></script>
     <script src="js/auth.js?v=6"></script>
-    <script src="js/patients.js?v=7"></script>
+    <script src="js/patients.js?v=8"></script>
     <script src="js/appointments.js?v=6"></script>
     <script src="js/profile.js?v=8"></script>
     <script src="js/messages.js?v=1"></script>
     <script src="js/monitor.js?v=3"></script>
     <script src="js/billing.js?v=9"></script>
-    <script src="js/admin.js?v=4"></script>
+    <script src="js/admin.js?v=5"></script>
 </body>
 </html>
