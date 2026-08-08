@@ -620,6 +620,11 @@
                             <i class="bi bi-heart-pulse me-1"></i><span data-i18n="admin.controls">Controles</span>
                         </button>
                     </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="Admin.showTab('activity')" data-admin-tab="activity">
+                            <i class="bi bi-graph-up me-1"></i><span data-i18n="admin.activity">Actividad</span>
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Tab: Reciente -->
@@ -724,6 +729,23 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Tab: Actividad -->
+                <div id="adminTab-activity" class="d-none">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-graph-up me-2"></i>Actividad de Usuarios</h6>
+                            <button class="btn btn-outline-primary btn-sm" onclick="Admin.loadActivity()">
+                                <i class="bi bi-arrow-repeat me-1"></i>Actualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="adminActivityList">
+                                <div class="text-center text-muted py-4">Cargando...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -799,6 +821,6 @@
     <script src="js/messages.js?v=1"></script>
     <script src="js/monitor.js?v=3"></script>
     <script src="js/billing.js?v=9"></script>
-    <script src="js/admin.js?v=3"></script>
+    <script src="js/admin.js?v=4"></script>
 </body>
 </html>
