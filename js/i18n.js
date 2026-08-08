@@ -109,6 +109,7 @@ const I18n = {
             'admin.users': 'Usuarios',
             'admin.errors': 'Errores',
             'admin.controls': 'Controles',
+            'admin.activity': 'Actividad',
             'admin.latestUsers': 'Últimos Profesionales Registrados',
             'admin.recentErrors': 'Errores Recientes',
             'admin.systemStatus': 'Estado del Sistema',

@@ -140,6 +140,134 @@ const Admin = {
         }
     },
 
+    async loadActivity() {
+        const { collection, getDocs } = window.firebaseExports;
+        const db = window.firebaseDB;
+
+        const container = document.getElementById('adminActivityList');
+        container.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-hourglass-split me-2"></i>Cargando actividad...</div>';
+
+        try {
+            const usersSnapshot = await getDocs(collection(db, 'users'));
+            const users = usersSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+            if (users.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-4">No hay usuarios registrados</div>';
+                return;
+            }
+
+            const rows = [];
+
+            for (const user of users) {
+                let patientCount = 0;
+                let appointmentCount = 0;
+                let lastActivity = null;
+
+                try {
+                    const patientsSnapshot = await getDocs(collection(db, 'users', user.id, 'patients'));
+                    patientCount = patientsSnapshot.size;
+
+                    const apptsSnapshot = await getDocs(collection(db, 'users', user.id, 'appointments'));
+                    appointmentCount = apptsSnapshot.size;
+
+                    apptsSnapshot.docs.forEach((doc) => {
+                        const appt = doc.data();
+                        const apptDate = appt.createdAt ? new Date(appt.createdAt) : (appt.date ? new Date(appt.date + 'T' + (appt.time || '00:00')) : null);
+                        if (apptDate && (!lastActivity || apptDate > lastActivity)) {
+                            lastActivity = apptDate;
+                        }
+                    });
+
+                    patientsSnapshot.docs.forEach((doc) => {
+                        const pat = doc.data();
+                        const patDate = pat.createdAt ? new Date(pat.createdAt) : null;
+                        if (patDate && (!lastActivity || patDate > lastActivity)) {
+                            lastActivity = patDate;
+                        }
+                    });
+
+                    if (user.updatedAt) {
+                        const updDate = new Date(user.updatedAt);
+                        if (!lastActivity || updDate > lastActivity) {
+                            lastActivity = updDate;
+                        }
+                    }
+                } catch (e) {}
+
+                const planNames = { basic: 'Básico', professional: 'Profesional', clinic: 'Consultorio' };
+                const planColors = { basic: 'secondary', professional: 'primary', clinic: 'success' };
+                const planId = user.planId || 'basic';
+
+                let lastActivityStr = 'Nunca';
+                if (lastActivity) {
+                    const diff = Date.now() - lastActivity.getTime();
+                    const mins = Math.floor(diff / 60000);
+                    const hours = Math.floor(diff / 3600000);
+                    const days = Math.floor(diff / 86400000);
+
+                    if (mins < 1) lastActivityStr = 'Ahora mismo';
+                    else if (mins < 60) lastActivityStr = `Hace ${mins} min`;
+                    else if (hours < 24) lastActivityStr = `Hace ${hours}h`;
+                    else if (days < 7) lastActivityStr = `Hace ${days} días`;
+                    else lastActivityStr = lastActivity.toLocaleDateString('es-AR');
+                }
+
+                rows.push({
+                    name: user.name || 'Sin nombre',
+                    email: user.email,
+                    specialty: user.specialty || '',
+                    planId,
+                    planName: planNames[planId] || 'Básico',
+                    planColor: planColors[planId] || 'secondary',
+                    patientCount,
+                    appointmentCount,
+                    lastActivity: lastActivity || new Date(0),
+                    lastActivityStr
+                });
+            }
+
+            rows.sort((a, b) => b.lastActivity - a.lastActivity);
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Plan</th>
+                                <th class="text-center">Pacientes</th>
+                                <th class="text-center">Turnos</th>
+                                <th>Última actividad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map((r) => `
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">${r.name}</div>
+                                        <small class="text-muted">${r.email}</small>
+                                        ${r.specialty ? `<br><small class="text-muted">${r.specialty}</small>` : ''}
+                                    </td>
+                                    <td><span class="badge bg-${r.planColor}">${r.planName}</span></td>
+                                    <td class="text-center fw-bold">${r.patientCount}</td>
+                                    <td class="text-center fw-bold">${r.appointmentCount}</td>
+                                    <td><small>${r.lastActivityStr}</small></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted small mt-2">
+                    ${rows.length} usuario${rows.length !== 1 ? 's' : ''} · 
+                    ${rows.reduce((a, r) => a + r.patientCount, 0)} pacientes · 
+                    ${rows.reduce((a, r) => a + r.appointmentCount, 0)} turnos
+                </div>`;
+        } catch (err) {
+            console.error('[Admin] Load activity error:', err);
+            container.innerHTML = '<div class="text-center text-muted py-4">Error al cargar actividad</div>';
+        }
+    },
+
     async deleteUser(userId, userName) {
         if (!confirm(`¿Eliminar a ${userName} y todos sus datos?`)) return;
 
@@ -251,6 +379,7 @@ const Admin = {
             case 'users': this.loadUsers(); break;
             case 'errors': this.loadErrors(); break;
             case 'controls': this.loadSystemCheck(); break;
+            case 'activity': this.loadActivity(); break;
         }
     },
 
