@@ -655,7 +655,7 @@ const App = {
             {
                 icon: 'bi-people',
                 title: 'Gestioná tus Pacientes',
-                text: 'Creá fichas con datos de contacto, obra social y información médica. Todo centralizado.'
+                text: 'Creá fichas con datos de contacto e información del paciente. Todo centralizado.'
             },
             {
                 icon: 'bi-calendar-event',

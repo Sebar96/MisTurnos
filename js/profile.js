@@ -30,6 +30,7 @@ const Profile = {
             document.getElementById('profileInstagram').value = profile.instagram || '';
             document.getElementById('profileFacebook').value = profile.facebook || '';
             document.getElementById('profileLinkedIn').value = profile.linkedin || '';
+            document.getElementById('profileNeedsMedical').checked = profile.needsMedicalData || false;
 
             const photoPreview = document.getElementById('profilePhotoPreview');
             if (profile.photo) {
@@ -72,7 +73,8 @@ const Profile = {
             mapUrl: document.getElementById('profileMapUrl').value.trim(),
             instagram: App.sanitize(document.getElementById('profileInstagram').value.trim()),
             facebook: App.sanitize(document.getElementById('profileFacebook').value.trim()),
-            linkedin: App.sanitize(document.getElementById('profileLinkedIn').value.trim())
+            linkedin: App.sanitize(document.getElementById('profileLinkedIn').value.trim()),
+            needsMedicalData: document.getElementById('profileNeedsMedical').checked
         };
 
         try {

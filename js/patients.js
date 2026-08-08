@@ -10,6 +10,19 @@ const Patients = {
     _currentPage: 1,
     _perPage: 20,
 
+    async needsMedicalData() {
+        const uid = Auth.getUid();
+        if (!uid) return false;
+        const { doc, getDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+        try {
+            const docSnap = await getDoc(doc(db, 'users', uid));
+            return docSnap.exists() && docSnap.data().needsMedicalData === true;
+        } catch (err) {
+            return false;
+        }
+    },
+
     async getAll() {
         const uid = Auth.getUid();
         if (!uid) return [];
@@ -219,6 +232,37 @@ const Patients = {
             });
         }
 
+        const showMedical = await this.needsMedicalData();
+
+        const medicalFieldsHTML = showMedical ? `
+                    <!-- Datos médicos -->
+                    <div class="col-12">
+                        <h6 class="fw-bold text-muted mt-3"><i class="bi bi-heart-pulse me-2"></i>Datos Médicos</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cardiopatía</label>
+                        <select class="form-select" id="pCardiac">
+                            <option value="no">No</option>
+                            <option value="si">Sí</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Detalle cardiopatía</label>
+                        <input type="text" class="form-control" id="pCardiacDetail" placeholder="Ej: Arritmia, insuficiencia...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Enfermedades</label>
+                        <textarea class="form-control" id="pDiseases" rows="2" placeholder="Ej: Diabetes tipo 2, hipertensión..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Alergias</label>
+                        <textarea class="form-control" id="pAllergies" rows="2" placeholder="Ej: Penicilina, látex..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Medicación actual</label>
+                        <textarea class="form-control" id="pMedication" rows="2" placeholder="Ej: Losartán 50mg, Aspirina..."></textarea>
+                    </div>` : '';
+
         document.getElementById('modalBody').innerHTML = `
             <form id="patientForm" onsubmit="Patients.saveFromForm(event, '${patientId || ''}')">
                 <div class="row g-3">
@@ -249,34 +293,7 @@ const Patients = {
                         <label class="form-label">Motivo de consulta / Descripción</label>
                         <textarea class="form-control" id="pReason" rows="3" placeholder="Breve descripción del motivo de consulta..."></textarea>
                     </div>
-
-                    <!-- Datos médicos -->
-                    <div class="col-12">
-                        <h6 class="fw-bold text-muted mt-3"><i class="bi bi-heart-pulse me-2"></i>Datos Médicos</h6>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Cardiopatía</label>
-                        <select class="form-select" id="pCardiac">
-                            <option value="no">No</option>
-                            <option value="si">Sí</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Detalle cardiopatía</label>
-                        <input type="text" class="form-control" id="pCardiacDetail" placeholder="Ej: Arritmia, insuficiencia...">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Enfermedades</label>
-                        <textarea class="form-control" id="pDiseases" rows="2" placeholder="Ej: Diabetes tipo 2, hipertensión..."></textarea>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Alergias</label>
-                        <textarea class="form-control" id="pAllergies" rows="2" placeholder="Ej: Penicilina, látex..."></textarea>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Medicación actual</label>
-                        <textarea class="form-control" id="pMedication" rows="2" placeholder="Ej: Losartán 50mg, Aspirina..."></textarea>
-                    </div>
+                    ${medicalFieldsHTML}
                     <div class="col-12">
                         <label class="form-label">Observaciones</label>
                         <textarea class="form-control" id="pObservations" rows="2" placeholder="Otras observaciones relevantes..."></textarea>
@@ -487,6 +504,8 @@ const Patients = {
             .filter(a => a.patientId === patientId)
             .sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
 
+        const showMedical = await this.needsMedicalData();
+
         const initials = patient.name
             .split(' ')
             .filter((w) => w.length > 2)
@@ -566,16 +585,25 @@ const Patients = {
 
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
+                            <h6 class="detail-section-title">Información del Paciente</h6>
+                            ${renderInfoRow('Observaciones', patient.observations, 'bi-sticky')}
+                            ${!patient.observations ?
+                                '<div class="text-muted small">Sin información adicional cargada</div>' : ''}
+                        </div>
+                    </div>
+
+                    ${showMedical ? `
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
                             <h6 class="detail-section-title">Información Médica</h6>
                             ${patient.cardiac === 'si' ? renderInfoRow('Cardiopatía', patient.cardiacDetail || 'Sí', 'bi-heart-pulse') : ''}
                             ${renderInfoRow('Enfermedades', patient.diseases, 'bi-activity')}
                             ${renderInfoRow('Alergias', patient.allergies, 'bi-exclamation-triangle')}
                             ${renderInfoRow('Medicación', patient.medication, 'bi-capsule')}
-                            ${renderInfoRow('Observaciones', patient.observations, 'bi-sticky')}
-                            ${!patient.cardiac && !patient.diseases && !patient.allergies && !patient.medication && !patient.observations ?
+                            ${!patient.cardiac && !patient.diseases && !patient.allergies && !patient.medication ?
                                 '<div class="text-muted small">Sin información médica cargada</div>' : ''}
                         </div>
-                    </div>
+                    </div>` : ''}
                 </div>
 
                 <div class="col-lg-6">
