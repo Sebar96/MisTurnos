@@ -220,7 +220,7 @@ const Patients = {
             insurances.map((i) => `<option value="${i}">${i}</option>`).join('');
     },
 
-    showModal(patientId = null) {
+    async showModal(patientId = null) {
         const isEditing = patientId !== null;
 
         document.getElementById('modalTitle').textContent = isEditing ? 'Editar Paciente' : 'Nuevo Paciente';
