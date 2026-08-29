@@ -241,10 +241,6 @@ const Appointments = {
         }
     },
 
-    filter() {
-        this.render();
-    },
-
     _wizard: {
         step: 1,
         selectedPatientId: null,
