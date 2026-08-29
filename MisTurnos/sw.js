@@ -1,20 +1,13 @@
 /*
- * ============================================================
- * SERVICE WORKER PARA MisTurnos
- * ============================================================
- * Un Service Worker es un script que el navegador ejecuta en
- * segundo plano, separado de la página web. Permite:
- * 1. Cachear archivos estáticos para uso offline
- * 2. Interceptar peticiones de red
- * 3. Servir contenido desde la caché cuando no hay internet
- * ============================================================
+ * SERVICE WORKER v6 - MisTurnos
+ * Estrategia: Cache First para archivos estáticos, Network First para datos
  */
 
-// Nombre de la caché donde guardaremos los archivos
-const CACHE_NAME = 'misturnos-v1';
+const CACHE_NAME = 'misturnos-v6';
+const CACHE_STATIC = 'misturnos-static-v6';
+const CACHE_FONTS = 'misturnos-fonts-v1';
 
-// Lista de archivos a cachear cuando se instala el Service Worker
-const ASSETS_TO_CACHE = [
+const STATIC_ASSETS = [
     './',
     './index.html',
     './css/styles.css',
@@ -23,86 +16,110 @@ const ASSETS_TO_CACHE = [
     './js/patients.js',
     './js/appointments.js',
     './js/profile.js',
-    './manifest.json',
-    // Recursos externos (CDN)
+    './js/messages.js',
+    './js/monitor.js',
+    './js/billing.js',
+    './js/admin.js',
+    './manifest.json'
+];
+
+const CDN_ASSETS = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'
 ];
 
-/*
- * EVENTO: install
- * Se dispara cuando el navegador registra el Service Worker.
- * Acá cacheamos todos los archivos estáticos.
- */
+const FONT_ASSETS = [
+    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+];
+
 self.addEventListener('install', (event) => {
-    console.log('[SW] Instalando Service Worker...');
+    console.log('[SW v4] Instalando...');
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('[SW] Cacheando archivos estáticos...');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        Promise.all([
+            caches.open(CACHE_STATIC).then((cache) => {
+                console.log('[SW v4] Cacheando archivos estáticos...');
+                return cache.addAll(STATIC_ASSETS);
+            }),
+            caches.open(CACHE_FONTS).then((cache) => {
+                console.log('[SW v4] Cacheando CDNs y fuentes...');
+                return cache.addAll([...CDN_ASSETS, ...FONT_ASSETS]);
+            })
+        ])
     );
-    // Forzar que el nuevo SW active inmediatamente
     self.skipWaiting();
 });
 
-/*
- * EVENTO: activate
- * Se dispara después del install. Limpia cachés viejas
- * que ya no necesitamos (por ejemplo, cuando actualizás la versión).
- */
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activando Service Worker...');
+    console.log('[SW v4] Activando...');
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then((keys) => {
             return Promise.all(
-                cacheNames
-                    .filter((name) => name !== CACHE_NAME) // Cachés que no son la actual
-                    .map((name) => caches.delete(name))     // Las borramos
+                keys.filter((key) =>
+                    key !== CACHE_STATIC && key !== CACHE_FONTS
+                ).map((key) => {
+                    console.log('[SW v4] Eliminando caché viejo:', key);
+                    return caches.delete(key);
+                })
             );
         })
     );
-    // Tomar control de todas las pestañas inmediatamente
     self.clients.claim();
 });
 
-/*
- * EVENTO: fetch
- * Se dispara CADA VEZ que la página hace una petición de red
- * (imágenes, scripts, fetch a APIs, etc).
- * Estrategia: "Cache First" - primero intentamos desde la caché,
- * si no está, vamos a la red.
- */
 self.addEventListener('fetch', (event) => {
-    // Solo interceptamos peticiones GET (no POST, PUT, DELETE)
     if (event.request.method !== 'GET') return;
 
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            if (cachedResponse) {
-                // Si está en caché, lo devolvemos directamente
-                return cachedResponse;
-            }
-            // Si no está, vamos a la red
-            return fetch(event.request).then((networkResponse) => {
-                // Guardamos en caché para la próxima vez
-                // (solo si la respuesta es válida)
-                if (networkResponse && networkResponse.status === 200) {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                // Si falla la red Y no hay caché, mostramos fallback
-                // para páginas HTML
-                if (event.request.headers.get('accept').includes('text/html')) {
-                    return caches.match('./index.html');
-                }
-            });
-        })
-    );
+    const url = new URL(event.request.url);
+
+    if (url.pathname.startsWith('/users/') || url.pathname.includes('firestore')) {
+        event.respondWith(networkFirst(event.request));
+        return;
+    }
+
+    if (url.origin === location.origin) {
+        event.respondWith(cacheFirst(event.request));
+        return;
+    }
+
+    event.respondWith(cacheFirst(event.request));
+});
+
+async function cacheFirst(request) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    try {
+        const response = await fetch(request);
+        if (response && response.status === 200) {
+            const cacheName = request.url.includes('fonts.googleapis') ? CACHE_FONTS : CACHE_STATIC;
+            const cache = await caches.open(cacheName);
+            cache.put(request, response.clone());
+        }
+        return response;
+    } catch (err) {
+        if (request.headers.get('accept')?.includes('text/html')) {
+            return caches.match('./index.html');
+        }
+        return new Response('', { status: 408 });
+    }
+}
+
+async function networkFirst(request) {
+    try {
+        const response = await fetch(request);
+        return response;
+    } catch (err) {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        return new Response('[]', {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+}
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

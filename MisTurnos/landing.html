@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MisTurnos - Smart scheduling for professionals</title>
+    <meta name="description" content="Manage your appointments, patients and reminders in one place. Simple, fast, secure.">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+
+    <nav class="landing-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="#" class="logo">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>MisTurnos</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleTheme()">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary fw-bold" id="langToggle" onclick="toggleLang()">EN</button>
+                <a href="index.html" class="btn btn-sm btn-primary" data-i18n="nav.login">Iniciar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge" data-i18n="hero.badge">Para profesionales que dan turnos</div>
+                <h1><span data-i18n="hero.title1">Tu agenda,</span><br><span class="text-gradient" data-i18n="hero.title2">sin complicaciones.</span></h1>
+                <p class="hero-subtitle" data-i18n="hero.subtitle">
+                    Organizá pacientes, turnos y recordatorios en un solo lugar.
+                    Dejá de perder tiempo con libretas y planes de Google.
+                </p>
+                <div class="hero-actions">
+                    <a href="index.html" class="btn btn-primary btn-lg px-4">
+                        <span data-i18n="hero.cta">Empezá gratis</span>
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#como-funciona" class="btn btn-outline-secondary btn-lg px-4" data-i18n="hero.how">¿Cómo funciona?</a>
+                </div>
+                <div class="hero-proof">
+                    <span class="proof-dot"></span>
+                    <span data-i18n="hero.trial">Prueba gratuita de 30 días. Sin tarjeta de crédito.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="como-funciona">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="steps.title">En 3 pasos</h2>
+                <p data-i18n="steps.subtitle">No necesitás ser experto en tecnología.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 data-i18n="steps.s1.title">Cargá tus pacientes</h3>
+                    <p data-i18n="steps.s1.desc">Nombre, obra social, alergias, medicación — todo en un lugar solo.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 data-i18n="steps.s2.title">Agendá turnos</h3>
+                    <p data-i18n="steps.s2.desc">Elegí fecha, hora y motivo. Listo. El turno queda registrado.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 data-i18n="steps.s3.title">Mandá WhatsApp</h3>
+                    <p data-i18n="steps.s3.desc">Confirmación, recordatorio o reprogramación — con un toque.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="features.title">Todo lo que necesitás.</h2>
+                <p data-i18n="features.subtitle">Nada que no necesitás.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-people-fill"></i></div>
+                    <h4 data-i18n="features.f1.title">Pacientes</h4>
+                    <p data-i18n="features.f1.desc">Historial completo: datos, alergias, medicación, observaciones.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-calendar-week-fill"></i></div>
+                    <h4 data-i18n="features.f2.title">Turnos</h4>
+                    <p data-i18n="features.f2.desc">Cargá, modifiqué o cancelá turnos en segundos.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-whatsapp"></i></div>
+                    <h4>WhatsApp</h4>
+                    <p data-i18n="features.f3.desc">Mensajes prearmados para confirmar, recordar o reprogramar.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-phone-fill"></i></div>
+                    <h4 data-i18n="features.f5.title">Celular y PC</h4>
+                    <p data-i18n="features.f5.desc">Funciona en cualquier dispositivo. No necesitás instalar nada.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                    <h4 data-i18n="features.f6.title">Seguro</h4>
+                    <p data-i18n="features.f6.desc">Tus datos se guardan en la nube. Nadie más los ve.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="planes">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n="pricing.title">Planes simples.</h2>
+                <p data-i18n="pricing.subtitle">Sin sorpresas. Sin permanencia.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <div class="price-name">Básico</div>
+                    <div class="price-amount">$5.000<span>/mes</span></div>
+                    <div class="price-usd">~USD $5/mes</div>
+                    <ul class="price-features">
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b1">1 usuario</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b2">Hasta 25 pacientes</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b3">Turnos ilimitados</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b4">WhatsApp manual</span></li>
+                    </ul>
+                    <a href="index.html" class="btn btn-outline-primary w-100" data-i18n="pricing.cta">Empezar</a>
+                </div>
+                <div class="price-card price-card--popular">
+                    <div class="price-popular-badge" data-i18n="pricing.popular">Más elegido</div>
+                    <div class="price-name">Profesional</div>
+                    <div class="price-amount">$10.000<span>/mes</span></div>
+                    <div class="price-usd">~USD $10/mes</div>
+                    <ul class="price-features">
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.p1">Hasta 2 usuarios</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.p2">Hasta 50 pacientes</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b3">Turnos ilimitados</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.p4">Recordatorios automáticos</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.p5">Estadísticas básicas</span></li>
+                    </ul>
+                    <a href="index.html" class="btn btn-primary w-100" data-i18n="pricing.cta">Empezar</a>
+                </div>
+                <div class="price-card">
+                    <div class="price-name">Consultorio</div>
+                    <div class="price-amount">$15.000<span>/mes</span></div>
+                    <div class="price-usd">~USD $15/mes</div>
+                    <ul class="price-features">
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.c1">Hasta 3 usuarios</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.c2">Pacientes ilimitados</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.b3">Turnos ilimitados</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.c4">Agenda compartida</span></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <span data-i18n="pricing.c5">Soporte prioritario</span></li>
+                    </ul>
+                    <a href="index.html" class="btn btn-outline-primary w-100" data-i18n="pricing.cta">Empezar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container text-center">
+            <h2 data-i18n="cta.title">¿Listo para organizarte?</h2>
+            <p class="cta-subtitle" data-i18n="cta.subtitle">Creá tu cuenta en 2 minutos. Sin tarjeta, sin compromiso.</p>
+            <a href="index.html" class="btn btn-primary btn-lg px-5">
+                <span data-i18n="hero.cta">Empezá gratis</span>
+                <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div class="footer-brand">
+                    <i class="bi bi-calendar-check-fill"></i>
+                    <span>MisTurnos</span>
+                </div>
+                <div class="footer-links">
+                    <a href="terms.html" data-i18n="footer.terms">Términos</a>
+                    <a href="privacy.html" data-i18n="footer.privacy">Privacidad</a>
+                    <a href="mailto:ayuda.misturnos@gmail.com" data-i18n="footer.contact">Contacto</a>
+                </div>
+                <div class="footer-copy">
+                    © 2026 Sebastián Russo
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/i18n.js?v=1"></script>
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-bs-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        function toggleLang() {
+            if (typeof I18n !== 'undefined') {
+                I18n.toggle();
+            }
+        }
+
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-bs-theme', saved);
+            if (typeof I18n !== 'undefined') I18n.init();
+        })();
+    </script>
+
+</body>
+</html>

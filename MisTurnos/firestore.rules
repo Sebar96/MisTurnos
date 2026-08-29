@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can read/write their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+
+      // Admin can read all user subcollections
+      match /patients/{patientId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /appointments/{appointmentId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Errors: any authenticated user can write, only admin can read
+    match /errors/{errorId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Activity log: any authenticated user can write, only admin can read
+    match /activityLog/{logId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // System checks: any authenticated user can write, only admin can read
+    match /systemChecks/{checkId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}

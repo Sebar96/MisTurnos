@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * PROFILE.JS - Firestore
  */
 
@@ -27,6 +30,7 @@ const Profile = {
             document.getElementById('profileInstagram').value = profile.instagram || '';
             document.getElementById('profileFacebook').value = profile.facebook || '';
             document.getElementById('profileLinkedIn').value = profile.linkedin || '';
+            document.getElementById('profileNeedsMedical').checked = profile.needsMedicalData || false;
 
             const photoPreview = document.getElementById('profilePhotoPreview');
             if (profile.photo) {
@@ -35,6 +39,17 @@ const Profile = {
 
             document.getElementById('profileNameDisplay').textContent = profile.name || user.name;
             document.getElementById('profileSpecialtyDisplay').textContent = profile.specialty || user.specialty;
+
+            const planBadge = document.getElementById('profilePlanDisplay');
+            if (planBadge) {
+                const currentPlan = await Billing.getCurrentPlan(uid);
+                const planDetails = Billing.plans[currentPlan.planId];
+                if (planDetails) {
+                    planBadge.textContent = planDetails.name;
+                    const colors = { basic: 'secondary', professional: 'primary', clinic: 'success' };
+                    planBadge.className = `badge bg-${colors[currentPlan.planId] || 'secondary'} ms-2`;
+                }
+            }
 
             this.updateMapPreview(profile.mapUrl || '');
         } catch (err) {
@@ -45,20 +60,21 @@ const Profile = {
     async save(event) {
         event.preventDefault();
 
-        const { doc, setDoc } = window.firebaseExports;
-        const db = window.firebaseDB;
-        const uid = Auth.getUid();
+        const { doc, setDoc, getDoc } = window.firebaseExports;
+                const db = window.firebaseDB;
+                const uid = Auth.getUid();
 
         const profile = {
-            name: document.getElementById('profileName').value.trim(),
-            specialty: document.getElementById('profileSpecialty').value.trim(),
+            name: App.sanitize(document.getElementById('profileName').value.trim()),
+            specialty: App.sanitize(document.getElementById('profileSpecialty').value.trim()),
             email: document.getElementById('profileEmail').value.trim(),
-            phone: document.getElementById('profilePhone').value.trim(),
-            address: document.getElementById('profileAddress').value.trim(),
+            phone: App.sanitize(document.getElementById('profilePhone').value.trim()),
+            address: App.sanitize(document.getElementById('profileAddress').value.trim()),
             mapUrl: document.getElementById('profileMapUrl').value.trim(),
-            instagram: document.getElementById('profileInstagram').value.trim(),
-            facebook: document.getElementById('profileFacebook').value.trim(),
-            linkedin: document.getElementById('profileLinkedIn').value.trim()
+            instagram: App.sanitize(document.getElementById('profileInstagram').value.trim()),
+            facebook: App.sanitize(document.getElementById('profileFacebook').value.trim()),
+            linkedin: App.sanitize(document.getElementById('profileLinkedIn').value.trim()),
+            needsMedicalData: document.getElementById('profileNeedsMedical').checked
         };
 
         try {

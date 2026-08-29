@@ -1,4 +1,7 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * AUTH.JS - Firebase Authentication
  */
 
@@ -52,11 +55,27 @@ const Auth = {
         return this._currentFirebaseUser ? this._currentFirebaseUser.uid : null;
     },
 
+    isAdmin() {
+        return this._currentFirebaseUser && this._currentFirebaseUser.email === 'sebarusso96@gmail.com';
+    },
+
     showApp(user) {
         document.getElementById('page-login').classList.add('d-none');
         document.getElementById('navbar').classList.remove('d-none');
+        document.getElementById('appFooter').classList.remove('d-none');
         document.getElementById('navUserName').textContent = user.name || user.email || 'Usuario';
-        App.navigate('dashboard');
+
+        const adminItem = document.getElementById('navAdminItem');
+
+        if (this.isAdmin()) {
+            if (adminItem) adminItem.style.display = '';
+            App.navigate('admin');
+        } else {
+            if (adminItem) adminItem.style.display = 'none';
+            App.navigate('dashboard');
+        }
+
+        setTimeout(() => App.checkOnboarding(), 500);
     },
 
     showLogin() {
@@ -65,6 +84,7 @@ const Auth = {
             if (s.id !== 'page-login') s.classList.add('d-none');
         });
         document.getElementById('navbar').classList.add('d-none');
+        document.getElementById('appFooter').classList.add('d-none');
     },
 
     async login(event) {
@@ -106,8 +126,8 @@ const Auth = {
         const auth = window.firebaseAuth;
         const db = window.firebaseDB;
 
-        const name = document.getElementById('regName').value.trim();
-        const specialty = document.getElementById('regSpecialty').value.trim();
+        const name = App.sanitize(document.getElementById('regName').value.trim());
+        const specialty = App.sanitize(document.getElementById('regSpecialty').value.trim());
         const email = document.getElementById('regEmail').value.trim().toLowerCase();
         const password = document.getElementById('regPassword').value;
         const passwordConfirm = document.getElementById('regPasswordConfirm').value;
@@ -131,10 +151,17 @@ const Auth = {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
+            const trialExpiry = new Date();
+            trialExpiry.setDate(trialExpiry.getDate() + 30);
+
             await setDoc(doc(db, 'users', uid), {
                 name: name,
                 specialty: specialty,
                 email: email,
+                planId: 'basic',
+                planTrial: true,
+                planTrialExpiry: trialExpiry.toISOString(),
+                subscriptionStatus: 'active',
                 createdAt: new Date().toISOString()
             });
 
@@ -158,8 +185,14 @@ const Auth = {
         }
     },
 
-    async logout() {
-        if (!confirm('¿Seguro que querés cerrar sesión?')) return;
+    async logout(forced = false) {
+        if (!forced) {
+            const confirmed = await App.confirmAction('¿Seguro que querés cerrar sesión?', {
+                confirmText: 'Cerrar sesión',
+                confirmColor: 'danger'
+            });
+            if (!confirmed) return;
+        }
 
         const { signOut } = window.firebaseExports;
         const auth = window.firebaseAuth;
@@ -169,6 +202,45 @@ const Auth = {
             App.showToast('Sesión cerrada', 'info');
         } catch (err) {
             console.error('[Auth] Logout error:', err);
+        }
+    },
+
+    async loginWithGoogle() {
+        try {
+            const { GoogleAuthProvider, signInWithPopup } = window.firebaseExports;
+            const auth = window.firebaseAuth;
+            const provider = new GoogleAuthProvider();
+
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            const { doc, getDoc, setDoc } = window.firebaseExports;
+            const db = window.firebaseDB;
+
+            const docSnap = await getDoc(doc(db, 'users', user.uid));
+            if (!docSnap.exists()) {
+                const trialExpiry = new Date();
+                trialExpiry.setDate(trialExpiry.getDate() + 30);
+
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: user.displayName || '',
+                    email: user.email || '',
+                    specialty: '',
+                    photo: user.photoURL || '',
+                    planId: 'basic',
+                    planTrial: true,
+                    planTrialExpiry: trialExpiry.toISOString(),
+                    subscriptionStatus: 'active',
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            App.showToast('¡Bienvenido!', 'success');
+        } catch (err) {
+            console.error('[Auth] Google login error:', err);
+            if (err.code !== 'auth/popup-closed-by-user') {
+                App.showToast('Error al iniciar sesión con Google', 'danger');
+            }
         }
     }
 };

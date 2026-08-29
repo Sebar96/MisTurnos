@@ -2,51 +2,71 @@
 
 > **Tu agenda profesional, siempre a mano.**
 
-**MisTurnos** es una Progressive Web App (PWA) diseñada para profesionales independientes que necesitan gestionar sus turnos de forma simple, rápida y sin depender de un servidor. Ideal para médicos, psicólogos, nutricionistas, kinesiólogos, abogados y cualquier profesional que atienda con cita previa.
+**MisTurnos** es una Progressive Web App (PWA) diseñada para profesionales independientes que necesitan gestionar sus turnos de forma simple, rápida y en la nube. Ideal para médicos, odontólogos, psicólogos, nutricionistas, kinesiólogos, abogados y cualquier profesional que atienda con cita previa.
 
 ---
 
-## ✨ Funcionalidades Implementadas
+## ✨ Funcionalidades
 
-### 🔐 Autenticación
+### 🔐 Autenticación (Firebase)
 - Registro con nombre, especialidad, email y contraseña
-- Inicio de sesión con validación de credenciales
+- Inicio de sesión con Firebase Authentication
+- Datos guardados en la nube (Firestore)
+- Acceso desde cualquier dispositivo
 - Sesión persistente (no se desloguea al cerrar el navegador)
 
 ### 📊 Dashboard
-- Resumen visual con 4 tarjetas de estadísticas:
+- Resumen visual con 3 tarjetas de estadísticas:
   - Turnos del día
   - Turnos de la semana
-  - Total de pacientes activos
   - Turnos pendientes (programados + confirmados)
-- Lista de próximos turnos del día ordenados por hora
+- **Feed inicial muestra solo turnos de HOY**
 - Acciones rápidas: nuevo turno, nuevo paciente, enviar recordatorios
 
-### 🧙 Wizard de Turnos (Turno → Paciente → Listo)
+### 🧙 Wizard de Turnos
 - **Paso 1:** Buscar paciente existente por nombre o teléfono
-- **Paso 2:** Si no existe, botón **"Crear paciente rápido"** (solo nombre y teléfono)
+- **Paso 2:** Si no existe, botón **"Crear paciente rápido"**
 - **Paso 3:** Seleccionar fecha, hora, motivo y notas
-- Flujo rápido y sin fricciones para asignar turnos
+- Flujo rápido y sin fricciones
 
 ### 👥 Gestión de Pacientes
 - Alta, baja y edición de pacientes
-- Campos: nombre, teléfono, email, obra social, motivo de consulta
-- Búsqueda en tiempo real por nombre, teléfono o email
-- Filtros por estado (activo/inactivo) y obra social
-- Botón de **WhatsApp directo** en cada tarjeta
-- Botón para crear turno rápido desde la tarjeta del paciente
+- Campos completos:
+  - Nombre, teléfono, email
+  - Obra social / Prepaga
+  - **Cardiopatía** (sí/no + detalle)
+  - **Enfermedades** (texto libre)
+  - **Alergias** (texto libre)
+  - **Medicación actual** (texto libre)
+  - **Observaciones** (texto libre)
+- Búsqueda en tiempo real
+- Filtros por estado y obra social
+- Botón de WhatsApp directo
+- Botón para crear turno rápido
 
 ### 📆 Gestión de Turnos
 - Crear turno con selección de paciente, fecha y hora
 - Modificar turno existente
-- Reprogramar turno (cambiar fecha/hora)
-- Cancelar turno con **aviso previo de 30 minutos**
-- Detección de conflictos de horario (no permite dos turnos iguales)
-- Estados del turno:
-  - 🟦 **Programado** — recién creado
-  - 🟩 **Confirmado** — el paciente confirmó
-  - ⬜ **Realizado** — se cumplió el turno
-  - 🟥 **Cancelado** — se canceló
+- Reprogramar turno
+- Cancelar turno con aviso previo de 30 minutos
+- Detección de conflictos de horario
+- Estados: Programado → Confirmado → Realizado / Cancelado
+- **Botones de acción:** Confirmar, Marcar como realizado, Reprogramar, Editar, Cancelar
+
+### 📱 Mensajes WhatsApp Prearmados
+- **Confirmar turno** — "Le confirmamos que su turno está confirmado"
+- **Reprogramar turno** — Mensaje para reprogramar
+- **Cancelar turno (profesional)** — Cuando el profesional cancela
+- **Cancelar turno (paciente)** — Cuando el paciente cancela
+- **Recordatorio** — Día anterior al turno
+- Cada mensaje tiene botón **"Copiar"** → se pega en WhatsApp
+- **El profesional puede editar el mensaje antes de enviar**
+
+### 🗓️ Vista del Día
+- Feed inicial muestra solo turnos de HOY
+- Sección "Turnos" muestra todos
+- A medida que confirma/cancela, el turno desaparece del feed del día
+- El paciente queda registrado para futuros turnos
 
 ### 👤 Perfil del Profesional
 - Nombre completo y especialidad
@@ -54,35 +74,97 @@
 - Dirección del consultorio
 - Link de Google Maps con mapa embebido
 - Redes sociales: Instagram, Facebook, LinkedIn
-- Foto de perfil (subir imagen, se redimensiona automáticamente)
-
-### 📱 WhatsApp Integrado
-- Botón de WhatsApp directo en tarjetas de pacientes
-- Envío de **recordatorios por WhatsApp** el día anterior al turno
-- Mensaje de cancelación automática por WhatsApp
-- Links de WhatsApp prellenados con mensaje personalizado
+- Foto de perfil (redimensionamiento automático)
 
 ### 🌙 Modo Oscuro / Claro
-- Toggle con un clic en la barra de navegación
-- Respeta la preferencia del sistema operativo
-- Se guarda la elección para futuras sesiones
+- Toggle con un clic
+- Respeta la preferencia del sistema
+- Se guarda la elección
 
 ### 💾 Backup de Datos
-- **Exportar** todos los datos como archivo `.json`
-- **Importar** datos desde un archivo de backup
+- Exportar todos los datos como archivo `.json`
+- Importar datos desde un archivo de backup
 - Incluye: perfil, pacientes y turnos
 
-### 📲 PWA (Progressive Web App)
-- **Instalable** en celular, tablet y PC
-- Aparece como app independiente (sin barra de navegador)
-- Icono personalizado "MT" en azul-indigo
-- **Service Worker** para funcionamiento offline
-- Cache de archivos estáticos para carga instantánea
+### 📲 PWA
+- Instalable en celular, tablet y PC
+- Aparece como app independiente
+- Service Worker para funcionamiento offline
+- **Detección de actualizaciones** — Banner automático cuando hay nueva versión
+- Cache de archivos estáticos
 
-### 📱 Responsive
-- Se adapta a celular, tablet y PC
-- Navegación colapsable en móvil (menú hamburguesa)
-- Tarjetas y formularios que se reorganizan según el tamaño de pantalla
+---
+
+## 🔒 Seguridad
+
+### Seguridad de Datos
+- Cada usuario solo ve SUS datos (pacientes, turnos, perfil)
+- Firestore rules: solo podés leer/escribir tu propia carpeta
+- Datos guardados en la nube (no en el dispositivo)
+
+### Seguridad de Cuentas
+- Login con email/contraseña (Firebase Authentication)
+- Contraseña mínima 6 caracteres
+- Sesión persistente
+
+### Panel de Administrador (URL separada)
+- Login con email de administrador
+- Solo el administrador accede
+- Gestión de usuarios, pagos, errores
+
+---
+
+## 📊 Panel de Administrador
+
+**URL:** `https://sebarus96.github.io/MisTurnos/admin.html`
+
+### Métricas
+| Métrica | Descripción |
+|---------|-------------|
+| Profesionales activos | Total de usuarios registrados |
+| Turnos Hoy | Turnos creados hoy (todos los usuarios) |
+| Pacientes Totales | Total de pacientes en la base |
+| Errores (24h) | Errores en las últimas 24 horas |
+
+### Funciones
+- Ver lista de todos los profesionales
+- Ver/eliminar cuentas
+- Ver errores y alertas
+- Gestionar suscripciones (próximamente)
+
+### Cómo entrar
+1. Ir a `admin.html`
+2. Email: email de administrador
+3. Contraseña: misma contraseña de la app
+
+---
+
+## 🔔 Monitoreo y Alertas
+
+- Cada error se registra en Firestore con fecha, tipo y detalle
+- Panel de errores visible en el admin
+- Errores capturados automáticamente (JavaScript errors, Promise rejections)
+
+---
+
+## 💳 Suscripciones y Pagos
+
+### Paquetes
+
+| Paquete | Precio | Límite |
+|---------|--------|--------|
+| **Básico** | $8,000/mes | 100 pacientes |
+| **Profesional** | $12,000/mes | Pacientes ilimitados |
+| **Consultorio** | $18,000/mes | 3 usuarios, pacientes ilimitados |
+
+### Métodos de Pago
+- Mercado Pago (próximamente)
+- Transferencia bancaria
+
+### Estrategia de Precios
+- Precio inicial: $8,000/mes
+- Aumento: cada 6 meses, 10-15%
+- Primer mes: regalar o 50% de descuento
 
 ---
 
@@ -90,14 +172,16 @@
 
 | Tecnología | Uso |
 |---|---|
-| **HTML5** | Estructura semántica de la aplicación |
-| **CSS3** | Estilos personalizados con variables CSS (temas oscuro/claro) |
-| **JavaScript vanilla** | Toda la lógica de la aplicación (sin frameworks) |
-| **Bootstrap 5.3** | Grid responsive, modales, formularios, componentes UI |
-| **Bootstrap Icons** | Iconografía de la interfaz |
-| **Google Fonts (Inter)** | Tipografía moderna y legible |
-| **Service Worker** | Caché offline y funcionamiento sin conexión |
-| **localStorage** | Almacenamiento local de todos los datos (sin servidor) |
+| **HTML5** | Estructura semántica |
+| **CSS3** | Estilos con variables CSS (temas oscuro/claro) |
+| **JavaScript vanilla** | Toda la lógica (sin frameworks) |
+| **Bootstrap 5.3** | Grid responsive, modales, formularios |
+| **Bootstrap Icons** | Iconografía |
+| **Google Fonts (Inter)** | Tipografía moderna |
+| **Firebase Authentication** | Login/registro de usuarios |
+| **Firebase Firestore** | Base de datos en la nube |
+| **Service Worker** | Caché offline + actualizaciones |
+| **GitHub Pages** | Hosting gratuito |
 
 ---
 
@@ -106,68 +190,27 @@
 ```
 MisTurnos/
 │
-├── index.html              ← Archivo principal (SPA con todas las secciones)
-├── manifest.json           ← Configuración PWA (nombre, iconos, colores)
-├── sw.js                   ← Service Worker (caché offline)
-├── generate-icons.js       ← Script para generar iconos PNG (Node.js)
+├── index.html              ← Archivo principal (SPA)
+├── admin.html              ← Panel de administrador
+├── manifest.json           ← Configuración PWA
+├── sw.js                   ← Service Worker (caché + actualizaciones)
 │
 ├── css/
-│   └── styles.css          ← Estilos custom + modo oscuro/claro + responsive
+│   └── styles.css          ← Estilos custom + modo oscuro/claro
 │
 ├── js/
-│   ├── app.js              ← Cerebro principal: init, navegación, tema, export/import
-│   ├── auth.js             ← Registro, login, logout, hash de contraseñas
-│   ├── patients.js         ← CRUD de pacientes, búsqueda, filtros, creación rápida
-│   ├── appointments.js     ← CRUD de turnos, wizard, estados, recordatorios
-│   └── profile.js          ← Perfil profesional, foto, mapa, redes sociales
+│   ├── app.js              ← Lógica principal, navegación, tema, actualizaciones
+│   ├── auth.js             ← Firebase Authentication
+│   ├── patients.js         ← CRUD pacientes (Firestore)
+│   ├── appointments.js     ← CRUD turnos (Firestore)
+│   ├── profile.js          ← Perfil profesional (Firestore)
+│   ├── messages.js         ← Mensajes WhatsApp prearmados
+│   ├── monitor.js          ← Sistema de errores y alertas
+│   └── billing.js          ← Suscripciones y pagos
 │
 └── img/
     ├── icon-192x192.png    ← Icono PWA 192x192px
     └── icon-512x512.png    ← Icono PWA 512x512px
-```
-
-### Descripción de cada archivo
-
-| Archivo | Descripción |
-|---|---|
-| `index.html` | Punto de entrada. Contiene todas las secciones (login, dashboard, pacientes, turnos, perfil) como divs que se muestran/ocultan con JavaScript. Incluye el modal genérico y los toasts de notificación. |
-| `manifest.json` | Define los metadatos de la PWA: nombre, iconos, color de tema, modo display. Permite que el navegador ofrezca "Instalar app". |
-| `sw.js` | Service Worker que cachea todos los archivos estáticos. Usa estrategia "Cache First" para que la app funcione sin conexión a internet. |
-| `css/styles.css` | Estilos personalizados con CSS custom properties para el modo oscuro/claro. Incluye animaciones, scrollbar personalizada y estilos responsive. |
-| `js/app.js` | Funciones utilitarias: generación de IDs, formateo de fechas, navegación SPA, toggle de tema, export/import de datos, envío de recordatorios WhatsApp, y registro del Service Worker. |
-| `js/auth.js` | Manejo de sesiones: registro de usuarios (con hash de contraseña), inicio de sesión, cierre de sesión, y persistencia de sesión en localStorage. |
-| `js/patients.js` | Gestión completa de pacientes: crear, editar, buscar, filtrar, activar/desactivar, y creación rápida (solo nombre + teléfono) para el wizard de turnos. |
-| `js/appointments.js` | Gestión de turnos con wizard de 2 pasos: selección de paciente → fecha/hora. Incluye estados, reprogramación, cancelación con aviso, y detección de conflictos horarios. |
-| `js/profile.js` | Editor de perfil profesional: datos personales, ubicación del consultorio con mapa embebido, redes sociales, y subida de foto de perfil con redimensionamiento automático. |
-| `generate-icons.js` | Script de Node.js que genera los iconos PNG del proyecto desde cero, sin dependencias externas. Dibuja las letras "MT" en un círculo azul-indigo. |
-
----
-
-## 🚀 Cómo Ejecutar la App
-
-### Opción 1: Live Server (recomendado)
-
-1. Instalar [Visual Studio Code](https://code.visualstudio.com/)
-2. Instalar la extensión **Live Server** desde el marketplace
-3. Abrir la carpeta `MisTurnos` en VS Code
-4. Hacer clic derecho en `index.html` → **"Open with Live Server"**
-5. Se abrirá la app en `http://127.0.0.1:5500`
-
-> ⚠️ **¿Por qué Live Server?** El Service Worker solo funciona bajo protocolo HTTP, no con archivos directos (`file://`). Live Server simula un servidor local.
-
-### Opción 2: Python (alternativa)
-
-```bash
-cd MisTurnos
-python -m http.server 8000
-```
-
-Abrir `http://localhost:8000` en el navegador.
-
-### Opción 3: Node.js (alternativa)
-
-```bash
-npx serve MisTurnos
 ```
 
 ---
@@ -175,60 +218,85 @@ npx serve MisTurnos
 ## 📖 Cómo Usar la App
 
 ### 1️⃣ Registrarse
-1. Abrir la app y hacer clic en la pestaña **"Registrarse"**
+1. Abrir la app y hacer clic en **"Registrarse"**
 2. Completar nombre, especialidad, email y contraseña
 3. Hacer clic en **"Crear Cuenta"**
-4. Volver a la pestaña **"Iniciar Sesión"** y entrar con tus datos
 
 ### 2️⃣ Completar el Perfil
-1. Ir a **Perfil** desde el menú superior
-2. Completar datos del consultorio, redes sociales y subir foto
-3. Guardar cambios
+1. Ir a **Perfil**
+2. Completar datos del consultorio, redes sociales y foto
+3. Guardar
 
 ### 3️⃣ Crear un Paciente
 1. Ir a **Pacientes** → **"Nuevo Paciente"**
-2. Completar nombre, teléfono y demás datos
+2. Completar nombre, teléfono y datos médicos
 3. Guardar
 
 ### 4️⃣ Asignar un Turno
-1. Ir a **Turnos** → **"Nuevo Turno"** (o desde el Dashboard)
-2. **Paso 1:** Buscar y seleccionar el paciente en la lista
-   - Si no lo encontrás, hacé clic en **"Crear paciente rápido"**
-3. **Paso 2:** Elegir fecha, hora y opcionalmente motivo/notas
-4. Hacer clic en **"Crear Turno"** ✅
+1. Ir a **Turnos** → **"Nuevo Turno"**
+2. Buscar y seleccionar el paciente
+3. Elegir fecha, hora y detalles
+4. **"Crear Turno"** ✅
 
 ### 5️⃣ Gestionar el Turno
-- **Confirmar:** marcá el turno como confirmado cuando el paciente avise
-- **Reprogramar:** cambia fecha y hora sin perder los datos
-- **Cancelar:** con aviso previo de 30 minutos + opción de WhatsApp
+1. **Confirmar:** marcá el turno como confirmado cuando el paciente avise
+2. **Marcar como realizado:** después de atender al paciente
+3. **Reprogramar:** cambiar fecha y hora
+4. **Cancelar:** con aviso previo de 30 minutos
 
-### 6️⃣ Enviar Recordatorios
-- Desde el Dashboard, hacé clic en **"Enviar Recordatorios"**
-- Se abren ventanas de WhatsApp con el mensaje para cada paciente con turno mañana
+### 6️⃣ Enviar Mensajes WhatsApp
+1. Ir a **Turnos** y hacer clic en el botón verde de WhatsApp
+2. Elegir tipo de mensaje (confirmar, reprogramar, cancelar, recordatorio)
+3. Copiar el mensaje
+4. Pegar en WhatsApp y enviar
+
+### 7️⃣ Actualizaciones
+- Cuando haya una nueva versión, aparece un banner azul
+- Tocar **"Actualizar"** para recargar
 
 ---
 
-## 🔮 Próximos Pasos
+## 🗺️ Roadmap
 
-- [ ] 🗺️ **Google Maps API** — Geolocalización exacta del consultorio
-- [ ] 📧 **EmailJS** — Envío de recordatorios por email además de WhatsApp
-- [ ] 📅 **Google Calendar** — Sincronización bidireccional con el calendario
-- [ ] 👥 **Múltiples profesionales** — Panel de administración para clínicas
-- [ ] 🔔 **Notificaciones push** — Alertas nativas del navegador
-- [ ] 📊 **Reportes y estadísticas** — Gráficos de asistencia, ingresos, etc.
-- [ ] 💳 **Turnos online** — Link público para que pacientes pidan turnos solos
-- [ ] 🌐 **Multi-idioma** — Soporte para español, inglés y portugués
+### FASE 1 — Completada ✅
+- [x] App PWA con login/registro
+- [x] Dashboard con estadísticas
+- [x] Gestión de pacientes y turnos
+- [x] WhatsApp integrado
+- [x] Firebase Authentication + Firestore
+
+### FASE 2 — Completada ✅
+- [x] Cambios en dashboard (quitar cuadrito Pacientes)
+- [x] Campos nuevos en pacientes (cardiopatía, enfermedades, alergias, medicación, observaciones)
+- [x] Mensajes WhatsApp prearmados con botón copiar
+- [x] Vista del día (solo turnos de hoy en feed)
+- [x] Panel de administrador
+- [x] Sistema de monitoreo y alertas
+- [x] Sistema de suscripciones y pagos
+- [x] Detección de actualizaciones PWA
+- [x] Botón "Marcar como realizado" en turnos
+
+### FASE 3 — Futuro
+- [ ] Integración con Mercado Pago
+- [ ] EmailJS para recordatorios por email
+- [ ] Google Calendar sync
+- [ ] Turnos online (link público)
+- [ ] Multi-idioma
+- [ ] Notificaciones push
+- [ ] Landing page para vender
+- [ ] Sistema de soporte
 
 ---
 
 ## 👨‍💻 Autor
 
-**Sebastián**
+**Sebastián Russo**
 Estudiante de **Analista Programador Universitario** — UNLP
+GitHub: [@Sebarus96](https://github.com/Sebarus96)
 Año 2026
 
 ---
 
 ## 📄 Licencia
 
-Este es un proyecto de uso libre y educativo.
+Proyecto de uso libre y educativo.

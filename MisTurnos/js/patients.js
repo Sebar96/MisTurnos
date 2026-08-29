@@ -1,25 +1,46 @@
 /*
+ * MisTurnos - © 2026 Sebastián Russo
+ * Todos los derechos reservados.
+ *
  * PATIENTS.JS - Firestore
  */
 
 const Patients = {
 
-    _cache: [],
+    _currentPage: 1,
+    _perPage: 20,
+
+    async needsMedicalData() {
+        const uid = Auth.getUid();
+        if (!uid) return false;
+        const { doc, getDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+        try {
+            const docSnap = await getDoc(doc(db, 'users', uid));
+            return docSnap.exists() && docSnap.data().needsMedicalData === true;
+        } catch (err) {
+            return false;
+        }
+    },
 
     async getAll() {
         const uid = Auth.getUid();
         if (!uid) return [];
+
+        const cached = Cache.get(`patients_${uid}`);
+        if (cached) return cached;
 
         const { collection, getDocs } = window.firebaseExports;
         const db = window.firebaseDB;
 
         try {
             const snapshot = await getDocs(collection(db, 'users', uid, 'patients'));
-            this._cache = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-            return this._cache;
+            const patients = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+            Cache.set(`patients_${uid}`, patients);
+            return patients;
         } catch (err) {
             console.error('[Patients] Error getting patients:', err);
-            return this._cache;
+            return [];
         }
     },
 
@@ -29,8 +50,10 @@ const Patients = {
     },
 
     async render() {
-        const patients = await this.getAll();
         const container = document.getElementById('patientsList');
+        App.showSkeleton(container, 'cards');
+
+        const patients = await this.getAll();
 
         if (patients.length === 0) {
             container.innerHTML = `
@@ -45,11 +68,58 @@ const Patients = {
         }
 
         this.populateInsuranceFilter(patients);
-        container.innerHTML = patients.map((patient) => this.renderCard(patient)).join('');
+        this._allPatients = patients;
+        this._currentPage = 1;
+        this.renderPage();
+    },
+
+    renderPage() {
+        const patients = this._allPatients || [];
+        const container = document.getElementById('patientsList');
+        const totalPages = Math.ceil(patients.length / this._perPage);
+        const start = (this._currentPage - 1) * this._perPage;
+        const pagePatients = patients.slice(start, start + this._perPage);
+
+        let html = pagePatients.map((patient) => this.renderCard(patient)).join('');
+
+        if (totalPages > 1) {
+            html += `
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mt-3 py-2">
+                        <small class="text-muted">Mostrando ${start + 1}-${Math.min(start + this._perPage, patients.length)} de ${patients.length} pacientes</small>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" ${this._currentPage === 1 ? 'disabled' : ''} onclick="Patients.goToPage(${this._currentPage - 1})">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" disabled>Página ${this._currentPage} de ${totalPages}</button>
+                            <button class="btn btn-outline-secondary" ${this._currentPage === totalPages ? 'disabled' : ''} onclick="Patients.goToPage(${this._currentPage + 1})">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    },
+
+    goToPage(page) {
+        this._currentPage = page;
+        this.renderPage();
+        document.getElementById('patientsList').scrollIntoView({ behavior: 'smooth' });
     },
 
     renderCard(patient) {
-        const initials = patient.name
+        const name = App.escapeHtml(patient.name || '');
+        const email = App.escapeHtml(patient.email || '');
+        const insurance = App.escapeHtml(patient.insurance || '');
+        const reason = App.escapeHtml(patient.reason || '');
+        const phone = App.escapeHtml(patient.phone || '');
+        const phoneAttr = App.escapeAttr(patient.phone || '');
+        const nameAttr = App.escapeAttr(patient.name || '');
+        const idAttr = App.escapeAttr(patient.id || '');
+
+        const initials = (patient.name || '')
             .split(' ')
             .filter((w) => w.length > 2)
             .map((w) => w[0])
@@ -62,38 +132,41 @@ const Patients = {
 
         return `
             <div class="col-sm-6 col-lg-4 col-xl-3">
-                <div class="card patient-card border-0 shadow-sm h-100">
+                <div class="card patient-card border-0 shadow-sm h-100" onclick="Patients.showDetail('${idAttr}')">
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
                             <div class="patient-avatar me-3">${initials}</div>
                             <div class="flex-grow-1 min-width-0">
-                                <h6 class="card-title fw-bold mb-0 text-truncate" title="${patient.name}">
-                                    ${patient.name}
+                                <h6 class="card-title fw-bold mb-0 text-truncate" title="${nameAttr}">
+                                    ${name}
                                 </h6>
-                                <small class="text-muted">${patient.email || 'Sin email'}</small>
+                                <small class="text-muted">${email || 'Sin email'}</small>
                                 <div class="mt-1">
                                     <span class="badge ${statusClass}">${statusText}</span>
-                                    ${patient.insurance ? `<span class="badge bg-light text-dark">${patient.insurance}</span>` : ''}
+                                    ${insurance ? `<span class="badge bg-light text-dark">${insurance}</span>` : ''}
                                 </div>
                             </div>
                         </div>
-                        ${patient.reason ? `<p class="small text-muted mb-3 text-truncate"><i class="bi bi-chat-dots me-1"></i>${patient.reason}</p>` : ''}
-                        ${patient.phone ? `<p class="small mb-3"><i class="bi bi-telephone me-1 text-primary"></i>${patient.phone}</p>` : ''}
-                        <div class="d-flex gap-2 flex-wrap">
+                        ${reason ? `<p class="small text-muted mb-3 text-truncate"><i class="bi bi-chat-dots me-1"></i>${reason}</p>` : ''}
+                        ${phone ? `<p class="small mb-3"><i class="bi bi-telephone me-1 text-primary"></i>${phone}</p>` : ''}
+                        <div class="d-flex gap-2 flex-wrap" onclick="event.stopPropagation()">
                             ${patient.phone ? `
-                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="App.openWhatsApp('${patient.phone}', 'Hola ${patient.name}, le escribimos desde MisTurnos.')">
+                                <button class="btn-whatsapp" title="Enviar WhatsApp" onclick="event.stopPropagation(); App.openWhatsApp('${phoneAttr}', 'Hola ${nameAttr}, le escribimos desde MisTurnos.')">
                                     <i class="bi bi-whatsapp"></i>
                                 </button>
                             ` : ''}
-                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="Appointments.showModal(null, '${patient.id}')">
+                            <button class="btn btn-outline-primary btn-sm" title="Crear turno" onclick="event.stopPropagation(); Appointments.showModal(null, '${idAttr}')">
                                 <i class="bi bi-calendar-plus"></i>
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="Patients.showModal('${patient.id}')">
+                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="event.stopPropagation(); Patients.showModal('${idAttr}')">
                                 <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" title="Eliminar" onclick="event.stopPropagation(); Patients.delete('${patient.id}', '${patient.name.replace(/'/g, "\\'")}')">
+                                <i class="bi bi-trash"></i>
                             </button>
                             <button class="btn btn-outline-${patient.status === 'active' ? 'warning' : 'success'} btn-sm"
                                     title="${patient.status === 'active' ? 'Desactivar' : 'Activar'}"
-                                    onclick="Patients.toggleStatus('${patient.id}')">
+                                    onclick="event.stopPropagation(); Patients.toggleStatus('${patient.id}')">
                                 <i class="bi bi-${patient.status === 'active' ? 'pause-circle' : 'play-circle'}"></i>
                             </button>
                         </div>
@@ -125,6 +198,9 @@ const Patients = {
             patients = patients.filter((p) => p.insurance === insuranceFilter);
         }
 
+        this._allPatients = patients;
+        this._currentPage = 1;
+
         const container = document.getElementById('patientsList');
         if (patients.length === 0) {
             container.innerHTML = `
@@ -133,7 +209,7 @@ const Patients = {
                     No se encontraron pacientes con esos filtros
                 </div>`;
         } else {
-            container.innerHTML = patients.map((p) => this.renderCard(p)).join('');
+            this.renderPage();
         }
     },
 
@@ -144,7 +220,7 @@ const Patients = {
             insurances.map((i) => `<option value="${i}">${i}</option>`).join('');
     },
 
-    showModal(patientId = null) {
+    async showModal(patientId = null) {
         const isEditing = patientId !== null;
 
         document.getElementById('modalTitle').textContent = isEditing ? 'Editar Paciente' : 'Nuevo Paciente';
@@ -155,6 +231,37 @@ const Patients = {
                 patient = p;
             });
         }
+
+        const showMedical = await this.needsMedicalData();
+
+        const medicalFieldsHTML = showMedical ? `
+                    <!-- Datos médicos -->
+                    <div class="col-12">
+                        <h6 class="fw-bold text-muted mt-3"><i class="bi bi-heart-pulse me-2"></i>Datos Médicos</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cardiopatía</label>
+                        <select class="form-select" id="pCardiac">
+                            <option value="no">No</option>
+                            <option value="si">Sí</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Detalle cardiopatía</label>
+                        <input type="text" class="form-control" id="pCardiacDetail" placeholder="Ej: Arritmia, insuficiencia...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Enfermedades</label>
+                        <textarea class="form-control" id="pDiseases" rows="2" placeholder="Ej: Diabetes tipo 2, hipertensión..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Alergias</label>
+                        <textarea class="form-control" id="pAllergies" rows="2" placeholder="Ej: Penicilina, látex..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Medicación actual</label>
+                        <textarea class="form-control" id="pMedication" rows="2" placeholder="Ej: Losartán 50mg, Aspirina..."></textarea>
+                    </div>` : '';
 
         document.getElementById('modalBody').innerHTML = `
             <form id="patientForm" onsubmit="Patients.saveFromForm(event, '${patientId || ''}')">
@@ -186,6 +293,11 @@ const Patients = {
                         <label class="form-label">Motivo de consulta / Descripción</label>
                         <textarea class="form-control" id="pReason" rows="3" placeholder="Breve descripción del motivo de consulta..."></textarea>
                     </div>
+                    ${medicalFieldsHTML}
+                    <div class="col-12">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="pObservations" rows="2" placeholder="Otras observaciones relevantes..."></textarea>
+                    </div>
                 </div>
             </form>`;
 
@@ -207,6 +319,12 @@ const Patients = {
                     document.getElementById('pInsurance').value = p.insurance || '';
                     document.getElementById('pStatus').value = p.status || 'active';
                     document.getElementById('pReason').value = p.reason || '';
+                    var elCardiac = document.getElementById('pCardiac'); if (elCardiac) elCardiac.value = p.cardiac || 'no';
+                    var elCardiacDetail = document.getElementById('pCardiacDetail'); if (elCardiacDetail) elCardiacDetail.value = p.cardiacDetail || '';
+                    var elDiseases = document.getElementById('pDiseases'); if (elDiseases) elDiseases.value = p.diseases || '';
+                    var elAllergies = document.getElementById('pAllergies'); if (elAllergies) elAllergies.value = p.allergies || '';
+                    var elMedication = document.getElementById('pMedication'); if (elMedication) elMedication.value = p.medication || '';
+                    document.getElementById('pObservations').value = p.observations || '';
                 }
             });
         }
@@ -220,17 +338,31 @@ const Patients = {
         const uid = Auth.getUid();
 
         const data = {
-            name: document.getElementById('pName').value.trim(),
-            phone: document.getElementById('pPhone').value.trim(),
-            email: document.getElementById('pEmail').value.trim(),
-            insurance: document.getElementById('pInsurance').value.trim(),
+            name: App.sanitize(document.getElementById('pName').value.trim()),
+            phone: App.sanitize(document.getElementById('pPhone').value.trim()),
+            email: App.sanitize(document.getElementById('pEmail').value.trim()),
+            insurance: App.sanitize(document.getElementById('pInsurance').value.trim()),
             status: document.getElementById('pStatus').value,
-            reason: document.getElementById('pReason').value.trim()
+            reason: App.sanitize(document.getElementById('pReason').value.trim()),
+            cardiac: document.getElementById('pCardiac')?.value || '',
+            cardiacDetail: App.sanitize((document.getElementById('pCardiacDetail')?.value || '').trim()),
+            diseases: App.sanitize((document.getElementById('pDiseases')?.value || '').trim()),
+            allergies: App.sanitize((document.getElementById('pAllergies')?.value || '').trim()),
+            medication: App.sanitize((document.getElementById('pMedication')?.value || '').trim()),
+            observations: App.sanitize(document.getElementById('pObservations').value.trim())
         };
 
         if (!data.name || !data.phone) {
             App.showToast('Nombre y teléfono son obligatorios', 'warning');
             return;
+        }
+
+        if (!patientId) {
+            const canAdd = await Billing.canAddPatient(uid);
+            if (!canAdd) {
+                Billing.showUpgradeModal('limit_reached');
+                return;
+            }
         }
 
         try {
@@ -239,12 +371,14 @@ const Patients = {
                     ...data,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
+                Cache.invalidate(`patients_${uid}`);
                 App.showToast('Paciente actualizado correctamente', 'success');
             } else {
                 await addDoc(collection(db, 'users', uid, 'patients'), {
                     ...data,
                     createdAt: new Date().toISOString()
                 });
+                Cache.invalidate(`patients_${uid}`);
                 App.showToast('Paciente creado correctamente', 'success');
             }
 
@@ -263,11 +397,17 @@ const Patients = {
         const db = window.firebaseDB;
         const uid = Auth.getUid();
 
-        const name = document.getElementById('qcName').value.trim();
-        const phone = document.getElementById('qcPhone').value.trim();
+        const name = App.sanitize(document.getElementById('qcName').value.trim());
+        const phone = App.sanitize(document.getElementById('qcPhone').value.trim());
 
         if (!name || !phone) {
             App.showToast('Nombre y teléfono son obligatorios', 'warning');
+            return;
+        }
+
+        const canAdd = await Billing.canAddPatient(uid);
+        if (!canAdd) {
+            Billing.showUpgradeModal('limit_reached');
             return;
         }
 
@@ -282,6 +422,7 @@ const Patients = {
                 createdAt: new Date().toISOString()
             });
 
+            Cache.invalidate(`patients_${uid}`);
             App.showToast(`${name} creado correctamente`, 'success');
 
             if (typeof callback === 'function') {
@@ -311,11 +452,170 @@ const Patients = {
                 updatedAt: new Date().toISOString()
             }, { merge: true });
 
+            Cache.invalidate(`patients_${uid}`);
             App.showToast(`${patient.name} ahora está ${newStatus === 'active' ? 'activo' : 'inactivo'}`, 'info');
             this.render();
         } catch (err) {
             console.error('[Patients] Toggle status error:', err);
             App.showToast('Error al cambiar estado', 'danger');
         }
+    },
+
+    async delete(patientId, patientName) {
+        const confirmed = await App.confirmAction(
+            `¿Eliminar a ${patientName}? Esta acción no se puede deshacer.`,
+            { confirmText: 'Eliminar', confirmColor: 'danger' }
+        );
+        if (!confirmed) return;
+
+        const { doc, deleteDoc } = window.firebaseExports;
+        const db = window.firebaseDB;
+        const uid = Auth.getUid();
+
+        try {
+            await deleteDoc(doc(db, 'users', uid, 'patients', patientId));
+            Cache.invalidate(`patients_${uid}`);
+            App.showToast(`${patientName} eliminado`, 'success');
+            this.render();
+        } catch (err) {
+            console.error('[Patients] Delete error:', err);
+            App.showToast('Error al eliminar paciente', 'danger');
+        }
+    },
+
+    async showDetail(patientId) {
+        App.navigate('patient-detail', { isSubPage: true });
+
+        const container = document.getElementById('page-patient-detail');
+        const content = container.querySelector('.detail-content');
+        App.showSkeleton(content, 'stats');
+
+        const patient = await this.getById(patientId);
+        if (!patient) {
+            container.querySelector('.detail-content').innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                    Paciente no encontrado
+                </div>`;
+            return;
+        }
+
+        const appointments = (await Appointments.getAll())
+            .filter(a => a.patientId === patientId)
+            .sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+
+        const showMedical = await this.needsMedicalData();
+
+        const initials = patient.name
+            .split(' ')
+            .filter((w) => w.length > 2)
+            .map((w) => w[0])
+            .slice(0, 2)
+            .join('')
+            .toUpperCase();
+
+        const statusClass = patient.status === 'active' ? 'bg-success' : 'bg-secondary';
+        const statusText = patient.status === 'active' ? 'Activo' : 'Inactivo';
+
+        const renderInfoRow = (label, value, icon) => {
+            if (!value) return '';
+            return `
+                <div class="detail-info-row">
+                    <span class="detail-info-label"><i class="bi ${icon} me-1"></i>${label}</span>
+                    <span class="detail-info-value">${App.escapeHtml(value)}</span>
+                </div>`;
+        };
+
+        let appointmentsHtml = '';
+        if (appointments.length === 0) {
+            appointmentsHtml = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x d-block mb-2 fs-4"></i>
+                    No hay turnos registrados
+                </div>`;
+        } else {
+            appointmentsHtml = appointments.slice(0, 10).map(a => {
+                const statusBadge = `<span class="badge badge-status badge-${a.status}">${Appointments.getStatusLabel(a.status)}</span>`;
+                return `
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="fw-semibold">${App.formatDateShort(a.date)}</span>
+                            <span class="ms-2 text-muted">${a.time}</span>
+                            ${a.reason ? `<span class="ms-2 small text-muted">${App.escapeHtml(a.reason)}</span>` : ''}
+                        </div>
+                        ${statusBadge}
+                    </div>`;
+            }).join('');
+            if (appointments.length > 10) {
+                appointmentsHtml += `
+                    <div class="text-center py-2">
+                        <small class="text-muted">Mostrando 10 de ${appointments.length} turnos</small>
+                    </div>`;
+            }
+        }
+
+        container.querySelector('.detail-content').innerHTML = `
+            <div class="detail-header">
+                <div class="detail-avatar">${initials}</div>
+                <div class="flex-grow-1">
+                    <h3 class="fw-bold mb-1">${App.escapeHtml(patient.name)}</h3>
+                    <span class="badge ${statusClass}">${statusText}</span>
+                    ${patient.insurance ? `<span class="badge bg-light text-dark ms-1">${App.escapeHtml(patient.insurance)}</span>` : ''}
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm" onclick="Appointments.showModal(null, '${patient.id}')">
+                        <i class="bi bi-calendar-plus me-1"></i>Nuevo Turno
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="Patients.showModal('${patient.id}')">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h6 class="detail-section-title">Información de Contacto</h6>
+                            ${renderInfoRow('Teléfono', patient.phone, 'bi-telephone')}
+                            ${renderInfoRow('Email', patient.email, 'bi-envelope')}
+                            ${renderInfoRow('Motivo', patient.reason, 'bi-chat-dots')}
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="detail-section-title">Información del Paciente</h6>
+                            ${renderInfoRow('Observaciones', patient.observations, 'bi-sticky')}
+                            ${!patient.observations ?
+                                '<div class="text-muted small">Sin información adicional cargada</div>' : ''}
+                        </div>
+                    </div>
+
+                    ${showMedical ? `
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="detail-section-title">Información Médica</h6>
+                            ${patient.cardiac === 'si' ? renderInfoRow('Cardiopatía', patient.cardiacDetail || 'Sí', 'bi-heart-pulse') : ''}
+                            ${renderInfoRow('Enfermedades', patient.diseases, 'bi-activity')}
+                            ${renderInfoRow('Alergias', patient.allergies, 'bi-exclamation-triangle')}
+                            ${renderInfoRow('Medicación', patient.medication, 'bi-capsule')}
+                            ${!patient.cardiac && !patient.diseases && !patient.allergies && !patient.medication ?
+                                '<div class="text-muted small">Sin información médica cargada</div>' : ''}
+                        </div>
+                    </div>` : ''}
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-transparent">
+                            <h6 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2"></i>Turnos Recientes</h6>
+                        </div>
+                        <div class="card-body">
+                            ${appointmentsHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
     }
 };
