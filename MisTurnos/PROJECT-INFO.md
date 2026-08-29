@@ -75,3 +75,38 @@ firebase deploy --only hosting
 - Login con email/password y Google
 - Sistema de onboarding para nuevos usuarios
 - Export/import de datos en JSON
+
+---
+
+## Cómo reportar errores (copia y pegá esto)
+
+Cuando tengas un error, decime algo como:
+
+```
+Error en la app:
+- Qué hice: [ej: "abrí un paciente para editarlo"]
+- Qué pasó: [ej: "no se abrió, salto error"]
+- Error: [pegá el mensaje de error del admin o consola]
+- Quién: [email del usuario]
+- Cuándo: [fecha/hora]
+```
+
+### Ejemplo:
+```
+Error en la app:
+- Qué hice: guardé un paciente nuevo
+- Qué pasó: se borró el formulario sin guardar
+- Error: null is not an object (evaluating 'pCardiac.value')
+- Quién: barbara.bronzi96@gmail.com
+- Cuándo: 28/8/2026, 09:04
+```
+
+### Dónde ver errores:
+1. **Panel Admin** → pestaña "Errores" → ahí aparecen todos
+2. **Consola del navegador** → F12 → pestaña Console
+3. **Firebase Console** → Firestore → colección "errors"
+
+### Para subir correcciones:
+1. Yo corrijo el código
+2. Vos hacé doble clic en `deploy.bat`
+3. Listo, queda online
