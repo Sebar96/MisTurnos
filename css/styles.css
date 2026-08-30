@@ -861,3 +861,19 @@ html[data-bs-theme="dark"] .btn-google:hover {
 .progress-bar {
     transition: width 0.5s ease;
 }
+
+/* ===================== UPDATE BANNER ===================== */
+@keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+#updateBanner {
+    animation: slideUp 0.3s ease;
+}
+
+/* ===================== VERSION BADGE ===================== */
+#appVersion {
+    font-weight: 600;
+    color: var(--text-secondary);
+}

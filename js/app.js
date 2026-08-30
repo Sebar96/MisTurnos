@@ -44,6 +44,8 @@ const App = {
 
     init() {
         console.log('[App] Inicializando MisTurnos...');
+        const versionEl = document.getElementById('appVersion');
+        if (versionEl) versionEl.textContent = this.APP_VERSION;
         this.registerServiceWorker();
         this.loadTheme();
         Auth.checkSession();
@@ -68,6 +70,8 @@ const App = {
         console.log('[App] MisTurnos listo.');
     },
 
+    APP_VERSION: '2.1.0',
+
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').then((reg) => {
@@ -80,23 +84,28 @@ const App = {
 
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // Hay una nueva versión disponible
                             this.showUpdateBanner();
                         }
                     });
                 });
+
+                // Check periódico cada 5 minutos
+                setInterval(() => { reg.update(); }, 5 * 60 * 1000);
             }).catch((err) => console.warn('[App] Error al registrar SW:', err));
         }
     },
 
     showUpdateBanner() {
-        // Crear banner de actualización
+        if (document.getElementById('updateBanner')) return;
+
         const banner = document.createElement('div');
         banner.id = 'updateBanner';
-        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#4f46e5;color:white;padding:12px 20px;z-index:9999;display:flex;align-items:center;justify-content:space-between;';
+        banner.style.cssText = 'position:fixed;bottom:20px;left:20px;right:20px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;padding:16px 20px;z-index:9999;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:space-between;animation:slideUp 0.3s ease;';
         banner.innerHTML = `
-            <span><i class="bi bi-arrow-up-circle me-2"></i>Nueva versión disponible</span>
-            <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:6px 16px;border-radius:6px;font-weight:600;cursor:pointer;">
+            <span><i class="bi bi-arrow-up-circle-fill me-2"></i><strong>¡Nueva versión disponible!</strong></span>
+            <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                Actualizar
+            </button>`;
                 Actualizar
             </button>`;
         document.body.appendChild(banner);
