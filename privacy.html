@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Política de Privacidad - MisTurnos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="css/landing.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="landing-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="landing.html" class="logo">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>MisTurnos</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
+                <button class="btn btn-sm btn-outline-secondary fw-bold" id="langToggle" onclick="toggleLang()">EN</button>
+                <a href="index.html" class="btn btn-sm btn-primary">Iniciar sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- ESPAÑOL -->
+                <div id="lang-es">
+                    <h1 class="fw-bold mb-2">Política de Privacidad</h1>
+                    <p class="text-muted mb-4">Última actualización: 30 de julio de 2026</p>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mt-4">1. Responsable del Tratamiento</h5>
+                            <p>El responsable del tratamiento de los datos personales es:</p>
+                            <ul>
+                                <li><strong>Nombre:</strong> Sebastián Russo</li>
+                                <li><strong>Email:</strong> sebarusso96@gmail.com</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">2. Datos que Recopilamos</h5>
+                            <p>En MisTurnos recopilamos los siguientes datos personales:</p>
+                            <ul>
+                                <li><strong>Datos del profesional:</strong> nombre, email, especialidad, teléfono, dirección del consultorio, redes sociales</li>
+                                <li><strong>Datos de pacientes:</strong> nombre, teléfono, email, obra social, datos médicos opcionales (alergias, enfermedades, medicación), observaciones</li>
+                                <li><strong>Datos de turnos:</strong> fechas, horarios, motivo, estado</li>
+                                <li><strong>Datos de uso:</strong> logs de errores, estadísticas de uso</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">3. Finalidad del Tratamiento</h5>
+                            <p>Los datos se utilizan exclusivamente para:</p>
+                            <ul>
+                                <li>Proveer el servicio de gestión de turnos y pacientes</li>
+                                <li>Enviar recordatorios de turnos (cuando el profesional lo solicita)</li>
+                                <li>Mejorar la plataforma y detectar problemas técnicos</li>
+                                <li>Comunicar actualizaciones del servicio</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">4. Almacenamiento y Seguridad</h5>
+                            <p>Los datos se almacenan en:</p>
+                            <ul>
+                                <li><strong>Firebase (Google):</strong> Base de datos en la nube con encriptación en tránsito y en reposo</li>
+                                <li><strong>GitHub Pages:</strong> Hosting estático (no se almacenan datos sensibles)</li>
+                            </ul>
+                            <p>Implementamos medidas de seguridad técnicas y organizativas para proteger los datos contra acceso no autorizado, pérdida o alteración.</p>
+
+                            <h5 class="fw-bold mt-4">5. Compartición con Terceros</h5>
+                            <p>No vendemos ni compartimos datos personales con terceros, excepto:</p>
+                            <ul>
+                                <li><strong>Firebase (Google):</strong> Proveedor de infraestructura de base de datos y autenticación</li>
+                                <li><strong>Mercado Pago:</strong> Para procesar pagos (cuando se active la función de cobro)</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">6. Derechos del Titular de los Datos</h5>
+                            <p>Conforme a la Ley N° 25.326 de Protección de Datos Personales, usted tiene derecho a:</p>
+                            <ul>
+                                <li><strong>Acceso:</strong> Conocer qué datos tenemos sobre usted</li>
+                                <li><strong>Rectificación:</strong> Corregir datos inexactos</li>
+                                <li><strong>Actualización:</strong> Mantener los datos actualizados</li>
+                                <li><strong>Supresión:</strong> Solicitar la eliminación de sus datos</li>
+                                <li><strong>Portabilidad:</strong> Solicitar sus datos en un formato estructurado</li>
+                            </ul>
+                            <p>Para ejercer estos derechos, envíe un email a: <strong>sebarusso96@gmail.com</strong></p>
+
+                            <h5 class="fw-bold mt-4">7. Retención de Datos</h5>
+                            <p>Los datos se mantienen mientras la cuenta del usuario esté activa. Una vez cancelada la cuenta, los datos se eliminan de forma permanente en un plazo máximo de 30 días.</p>
+
+                            <h5 class="fw-bold mt-4">8. Cookies y Tecnologías Similares</h5>
+                            <p>MisTurnos utiliza:</p>
+                            <ul>
+                                <li><strong>Local Storage:</strong> Para guardar preferencias del usuario (tema oscuro/claro, idioma)</li>
+                                <li><strong>Service Worker:</strong> Para el funcionamiento offline de la PWA</li>
+                            </ul>
+                            <p>No utilizamos cookies de rastreo ni publicitarias.</p>
+
+                            <h5 class="fw-bold mt-4">9. Menores de Edad</h5>
+                            <p>MisTurnos no está dirigido a menores de 18 años. No recopilamos intencionalmente datos de menores.</p>
+
+                            <h5 class="fw-bold mt-4">10. Cambios en esta Política</h5>
+                            <p>Nos reservamos el derecho de modificar esta política en cualquier momento. Los cambios serán publicados en esta página con la fecha de actualización.</p>
+
+                            <h5 class="fw-bold mt-4">11. Órgano de Control</h5>
+                            <p>La Agencia de Acceso a la Información Pública es el órgano de control de la Ley N° 25.326.</p>
+                            <p>Dirección: Av. Pte. Gral. Julio A. Roca 710, Piso 6°, Ciudad Autónoma de Buenos Aires</p>
+
+                            <h5 class="fw-bold mt-4">12. Contacto</h5>
+                            <p>Para consultas sobre esta política de privacidad:</p>
+                            <ul>
+                                <li>Email: sebarusso96@gmail.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENGLISH -->
+                <div id="lang-en" class="d-none">
+                    <h1 class="fw-bold mb-2">Privacy Policy</h1>
+                    <p class="text-muted mb-4">Last updated: July 30, 2026</p>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mt-4">1. Data Controller</h5>
+                            <p>The data controller is:</p>
+                            <ul>
+                                <li><strong>Name:</strong> Sebastián Russo</li>
+                                <li><strong>Email:</strong> sebarusso96@gmail.com</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">2. Data We Collect</h5>
+                            <p>MisTurnos collects the following personal data:</p>
+                            <ul>
+                                <li><strong>Professional data:</strong> name, email, specialty, phone, office address, social media</li>
+                                <li><strong>Patient data:</strong> name, phone, email, insurance, allergies, diseases, medication, medical notes</li>
+                                <li><strong>Appointment data:</strong> dates, times, reason, status</li>
+                                <li><strong>Usage data:</strong> error logs, usage statistics</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">3. Purpose of Processing</h5>
+                            <p>Data is used exclusively for:</p>
+                            <ul>
+                                <li>Providing the appointment and patient management service</li>
+                                <li>Sending appointment reminders (when requested by the professional)</li>
+                                <li>Improving the platform and detecting technical issues</li>
+                                <li>Communicating service updates</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">4. Storage and Security</h5>
+                            <p>Data is stored on:</p>
+                            <ul>
+                                <li><strong>Firebase (Google):</strong> Cloud database with encryption in transit and at rest</li>
+                                <li><strong>GitHub Pages:</strong> Static hosting (no sensitive data stored)</li>
+                            </ul>
+                            <p>We implement technical and organizational security measures to protect data against unauthorized access, loss or alteration.</p>
+
+                            <h5 class="fw-bold mt-4">5. Third-Party Sharing</h5>
+                            <p>We do not sell or share personal data with third parties, except:</p>
+                            <ul>
+                                <li><strong>Firebase (Google):</strong> Database and authentication infrastructure provider</li>
+                                <li><strong>Mercado Pago:</strong> To process payments (when billing is activated)</li>
+                            </ul>
+
+                            <h5 class="fw-bold mt-4">6. Data Subject Rights</h5>
+                            <p>In accordance with Law No. 25.326 on Personal Data Protection, you have the right to:</p>
+                            <ul>
+                                <li><strong>Access:</strong> Know what data we have about you</li>
+                                <li><strong>Rectification:</strong> Correct inaccurate data</li>
+                                <li><strong>Updating:</strong> Keep data up to date</li>
+                                <li><strong>Deletion:</strong> Request the elimination of your data</li>
+                                <li><strong>Portability:</strong> Request your data in a structured format</li>
+                            </ul>
+                            <p>To exercise these rights, send an email to: <strong>sebarusso96@gmail.com</strong></p>
+
+                            <h5 class="fw-bold mt-4">7. Data Retention</h5>
+                            <p>Data is kept while the user's account is active. Once the account is cancelled, data is permanently deleted within a maximum of 30 days.</p>
+
+                            <h5 class="fw-bold mt-4">8. Cookies and Similar Technologies</h5>
+                            <p>MisTurnos uses:</p>
+                            <ul>
+                                <li><strong>Local Storage:</strong> To save user preferences (dark/light theme, language)</li>
+                                <li><strong>Service Worker:</strong> For PWA offline functionality</li>
+                            </ul>
+                            <p>We do not use tracking or advertising cookies.</p>
+
+                            <h5 class="fw-bold mt-4">9. Minors</h5>
+                            <p>MisTurnos is not directed at individuals under 18 years of age. We do not intentionally collect data from minors.</p>
+
+                            <h5 class="fw-bold mt-4">10. Changes to this Policy</h5>
+                            <p>We reserve the right to modify this policy at any time. Changes will be published on this page with the update date.</p>
+
+                            <h5 class="fw-bold mt-4">11. Supervisory Authority</h5>
+                            <p>The Agencia de Acceso a la Información Pública is the supervisory authority for Law No. 25.326.</p>
+                            <p>Address: Av. Pte. Gral. Julio A. Roca 710, Floor 6, Autonomous City of Buenos Aires</p>
+
+                            <h5 class="fw-bold mt-4">12. Contact</h5>
+                            <p>For inquiries about this privacy policy:</p>
+                            <ul>
+                                <li>Email: sebarusso96@gmail.com</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="index.html" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-1"></i><span id="backText">Volver a MisTurnos</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted py-3 mt-4 border-top">
+        <small>© 2026 Sebastián Russo · MisTurnos · 
+            <a href="terms.html" class="text-decoration-none">Términos</a> · 
+            <a href="privacy.html" class="text-decoration-none">Privacidad</a>
+        </small>
+    </footer>
+
+    <script>
+        const esTexts = { back: 'Volver a MisTurnos', login: 'Iniciar sesión' };
+        const enTexts = { back: 'Back to MisTurnos', login: 'Log in' };
+
+        function getLang() { return localStorage.getItem('lang') || 'es'; }
+
+        function applyLang() {
+            const lang = getLang();
+            document.getElementById('lang-es').classList.toggle('d-none', lang !== 'es');
+            document.getElementById('lang-en').classList.toggle('d-none', lang !== 'en');
+            document.getElementById('langToggle').textContent = lang === 'es' ? 'EN' : 'ES';
+            document.getElementById('backText').textContent = lang === 'es' ? esTexts.back : enTexts.back;
+            document.documentElement.lang = lang;
+        }
+
+        function toggleLang() {
+            localStorage.setItem('lang', getLang() === 'es' ? 'en' : 'es');
+            applyLang();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', next);
+            localStorage.setItem('theme', next);
+        }
+
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-bs-theme', saved);
+            applyLang();
+        })();
+    </script>
+</body>
+</html>

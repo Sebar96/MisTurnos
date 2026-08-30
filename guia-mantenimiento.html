@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guía de Mantenimiento - MisTurnos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; color: #333; line-height: 1.6; }
+        h1 { color: #4f46e5; border-bottom: 3px solid #4f46e5; padding-bottom: 10px; }
+        h2 { color: #1e40af; margin-top: 30px; border-left: 4px solid #4f46e5; padding-left: 10px; }
+        h3 { color: #374151; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; }
+        th { background-color: #4f46e5; color: white; }
+        tr:nth-child(even) { background-color: #f3f4f6; }
+        .url { font-family: monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 3px; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin: 10px 0; }
+        .danger { background: #fee2e2; border-left: 4px solid #ef4444; padding: 10px; margin: 10px 0; }
+        .success { background: #d1fae5; border-left: 4px solid #10b981; padding: 10px; margin: 10px 0; }
+        code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        @media print { body { padding: 0; } }
+    </style>
+</head>
+<body>
+
+<h1>Guía de Mantenimiento - MisTurnos</h1>
+<p><strong>Última actualización:</strong> 06 de agosto de 2026</p>
+<p><strong>Autor:</strong> Sebastián Russo</p>
+
+<h2>1. Arquitectura del Sistema</h2>
+
+<table>
+    <tr>
+        <th>Componente</th>
+        <th>Qué hace</th>
+        <th>URL</th>
+    </tr>
+    <tr>
+        <td><strong>GitHub Pages</strong></td>
+        <td>Hosting de la app (HTML, CSS, JS)</td>
+        <td><span class="url">https://sebar96.github.io/MisTurnos/</span></td>
+    </tr>
+    <tr>
+        <td><strong>Firebase Auth</strong></td>
+        <td>Login con email y Google</td>
+        <td><span class="url">https://console.firebase.google.com/</span></td>
+    </tr>
+    <tr>
+        <td><strong>Firebase Firestore</strong></td>
+        <td>Base de datos (usuarios, pacientes, turnos)</td>
+        <td><span class="url">https://console.firebase.google.com/</span></td>
+    </tr>
+    <tr>
+        <td><strong>Vercel</strong></td>
+        <td>Backend serverless (API de pagos)</td>
+        <td><span class="url">https://vercel.com/sebar96/mis-turnos-API</span></td>
+    </tr>
+    <tr>
+        <td><strong>Mercado Pago</strong></td>
+        <td>Procesa los cobros</td>
+        <td><span class="url">https://www.mercadopago.com.ar/developers/</span></td>
+    </tr>
+</table>
+
+<h2>2. URLs Importantes</h2>
+
+<table>
+    <tr>
+        <th>Recurso</th>
+        <th>URL</th>
+    </tr>
+    <tr>
+        <td>App principal</td>
+        <td><span class="url">https://sebar96.github.io/MisTurnos/</span></td>
+    </tr>
+    <tr>
+        <td>Landing page</td>
+        <td><span class="url">https://sebar96.github.io/MisTurnos/landing.html</span></td>
+    </tr>
+    <tr>
+        <td>Admin panel</td>
+        <td><span class="url">https://sebar96.github.io/MisTurnos/#admin</span></td>
+    </tr>
+    <tr>
+        <td>API (checkout)</td>
+        <td><span class="url">https://mis-turnos-api.vercel.app/api/create-checkout</span></td>
+    </tr>
+    <tr>
+        <td>API (webhook)</td>
+        <td><span class="url">https://mis-turnos-api.vercel.app/api/webhook</span></td>
+    </tr>
+    <tr>
+        <td>GitHub repo (app)</td>
+        <td><span class="url">https://github.com/Sebarus96/MisTurnos</span></td>
+    </tr>
+    <tr>
+        <td>GitHub repo (API)</td>
+        <td><span class="url">https://github.com/Sebarus96/MisTurnos-api</span></td>
+    </tr>
+    <tr>
+        <td>Firebase Console</td>
+        <td><span class="url">https://console.firebase.google.com/</span></td>
+    </tr>
+    <tr>
+        <td>Vercel Dashboard</td>
+        <td><span class="url">https://vercel.com/sebar96/mis-turnos-API</span></td>
+    </tr>
+    <tr>
+        <td>Mercado Pago Devs</td>
+        <td><span class="url">https://www.mercadopago.com.ar/developers/</span></td>
+    </tr>
+</table>
+
+<h2>3. Monitoreo Semanal</h2>
+
+<h3>3.1 Firestore (miércoles o jueves)</h3>
+<ol>
+    <li>Ir a <span class="url">https://console.firebase.google.com/</span></li>
+    <li>Seleccionar proyecto <strong>MisTurnos</strong></li>
+    <li>Click en <strong>Firestore Database</strong></li>
+    <li>Verificar:
+        <ul>
+            <li><strong>users</strong>: Cuántos usuarios hay, sus planes activos</li>
+            <li><strong>errors</strong>: Si hubo errores nuevos</li>
+            <li><strong>activityLog</strong>: Qué acciones se hicieron</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>3.2 Vercel (semanal)</h3>
+<ol>
+    <li>Ir a <span class="url">https://vercel.com/sebar96/mis-turnos-API</span></li>
+    <li>Click en <strong>Logs</strong> en el menú izquierdo</li>
+    <li>Verificar:
+        <ul>
+            <li>Cuántas llamadas a <code>/api/create-checkout</code> hubo</li>
+            <li>Cuántos webhooks (<code>/api/webhook</code>) se recibieron</li>
+            <li>Si hay errores (status 500 o 400)</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>3.3 Mercado Pago (semanal)</h3>
+<ol>
+    <li>Ir a <span class="url">https://www.mercadopago.com.ar/developers/</span></li>
+    <li>Click en app <strong>MisTurnos-Pagos</strong></li>
+    <li>Verificar:
+        <ul>
+            <li>Cuántos pagos se procesaron</li>
+            <li>Ingresos totales</li>
+            <li>Pagos rechazados o pendientes</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>3.4 Panel Admin (semanal)</h3>
+<ol>
+    <li>Ir a <span class="url">https://sebar96.github.io/MisTurnos/#admin</span></li>
+    <li>Verificar:
+        <ul>
+            <li><strong>Pestaña Reciente</strong>: Actividad reciente</li>
+            <li><strong>Pestaña Usuarios</strong>: Usuarios registrados</li>
+            <li><strong>Pestaña Errores</strong>: Errores reportados</li>
+            <li><strong>Pestaña Controles</strong>: Estado del sistema</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>4. Errores Comunes y Soluciones</h2>
+
+<h3>4.1 "Error al guardar el perfil"</h3>
+<div class="warning">
+    <strong>Causa:</strong> Falta <code>getDoc</code> en la desestructuración de Firebase en <code>profile.js</code>
+</div>
+<p><strong>Solución:</strong> Verificar que en <code>js/profile.js</code>, dentro de <code>save()</code>, esté:</p>
+<pre><code>const { doc, setDoc, getDoc } = window.firebaseExports;</code></pre>
+
+<h3>4.2 Firestore bloqueado (ERR_BLOCKED_BY_CLIENT)</h3>
+<div class="warning">
+    <strong>Causa:</strong> El CSP (Content Security Policy) no permite conexiones a Firestore
+</div>
+<p><strong>Solución:</strong> Verificar en <code>index.html</code> que la meta CSP incluya:</p>
+<pre><code>connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://*.firebasestorage.app wss://*.googleapis.com https://mis-turnos-api.vercel.app;</code></pre>
+
+<h3>4.3 Pago aprobado pero plan no se actualiza</h3>
+<div class="warning">
+    <strong>Causa:</strong> El webhook no está configurado o falló
+</div>
+<p><strong>Solución:</strong></p>
+<ol>
+    <li>Verificar en Vercel > Logs que aparezca <code>POST /api/webhook</code></li>
+    <li>Verificar en Mercado Pago que el webhook esté configurado con URL: <code>https://mis-turnos-api.vercel.app/api/webhook</code></li>
+    <li>Verificar en Vercel > Settings > Environment Variables que <code>MP_ACCESS_TOKEN</code> y <code>FIREBASE_SERVICE_ACCOUNT</code> estén configurados</li>
+</ol>
+
+<h3>4.4 "Error al crear el checkout"</h3>
+<div class="danger">
+    <strong>Causa:</strong> La API de Vercel no responde o el token de Mercado Pago es inválido
+</div>
+<p><strong>Solución:</strong></p>
+<ol>
+    <li>Verificar que <code>MP_ACCESS_TOKEN</code> esté configurado en Vercel</li>
+    <li>Verificar en Vercel > Logs si hay errores</li>
+    <li>Probar la URL directamente: <code>https://mis-turnos-api.vercel.app/api/create-checkout</code> (debería devolver "Method not allowed")</li>
+</ol>
+
+<h3>4.5 App no carga o muestra versión vieja</h3>
+<div class="warning">
+    <strong>Causa:</strong> Caché del Service Worker
+</div>
+<p><strong>Solución:</strong> Al usuario afectado:</p>
+<ol>
+    <li>F12 > click derecho en ícono de recarga > <strong>"Vaciar caché y volver a cargar"</strong></li>
+    <li>O: F12 > Application > Storage > <strong>Clear site data</strong></li>
+</ol>
+
+<h3>4.6 "Method not allowed" al cargar la API</h3>
+<div class="success">
+    <strong>Es normal.</strong> El endpoint solo acepta POST. Si ves esto al abrir la URL en el navegador, la API está funcionando correctamente.
+</div>
+
+<h2>5. Credenciales (NO COMPARTIR)</h2>
+
+<table>
+    <tr>
+        <th>Servicio</th>
+        <th>Credencial</th>
+        <th>Dónde está</th>
+    </tr>
+    <tr>
+        <td>Firebase</td>
+        <td>API Key, Project ID</td>
+        <td>En <code>index.html</code> (firebaseConfig)</td>
+    </tr>
+    <tr>
+        <td>Mercado Pago</td>
+        <td>Public Key</td>
+        <td>En <code>js/billing.js</code></td>
+    </tr>
+    <tr>
+        <td>Mercado Pago</td>
+        <td>Access Token</td>
+        <td>Vercel > Settings > Environment Variables</td>
+    </tr>
+    <tr>
+        <td>Firebase Admin</td>
+        <td>Service Account JSON</td>
+        <td>Vercel > Settings > Environment Variables (<code>FIREBASE_SERVICE_ACCOUNT</code>)</td>
+    </tr>
+    <tr>
+        <td>Admin email</td>
+        <td>sebarusso96@gmail.com</td>
+        <td>En <code>js/admin.js</code></td>
+    </tr>
+</table>
+
+<div class="danger">
+    <strong>IMPORTANTE:</strong> Nunca compartas el Access Token de Mercado Pago ni el Service Account JSON. Si se comprometen, regenerarlos inmediatamente.
+</div>
+
+<h2>6. Precios de los Planes</h2>
+
+<table>
+    <tr>
+        <th>Plan</th>
+        <th>Precio (ARS)</th>
+        <th>Precio (USD)</th>
+        <th>Pacientes</th>
+        <th>Usuarios</th>
+    </tr>
+    <tr>
+        <td><strong>Básico</strong></td>
+        <td>$5.000/mes</td>
+        <td>~$5/mes</td>
+        <td>25</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td><strong>Profesional</strong></td>
+        <td>$10.000/mes</td>
+        <td>~$10/mes</td>
+        <td>50</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td><strong>Consultorio</strong></td>
+        <td>$15.000/mes</td>
+        <td>~$15/mes</td>
+        <td>Ilimitados</td>
+        <td>3</td>
+    </tr>
+</table>
+
+<h2>7. Flujo de Pago</h2>
+
+<ol>
+    <li>Usuario hace login en la app</li>
+    <li>Click en "Cambiar plan" > selecciona un plan</li>
+    <li>App llama a <code>/api/create-checkout</code> en Vercel</li>
+    <li>Vercel crea una preferencia en Mercado Pago</li>
+    <li>Usuario es redirigido a Mercado Pago para pagar</li>
+    <li>Después de pagar, Mercado Pago envía notificación a <code>/api/webhook</code></li>
+    <li>Vercel actualiza el plan del usuario en Firestore</li>
+    <li>Usuario vuelve a la app con su plan actualizado</li>
+</ol>
+
+<h2>8. Archivos Principales</h2>
+
+<table>
+    <tr>
+        <th>Archivo</th>
+        <th>Qué hace</th>
+    </tr>
+    <tr>
+        <td><code>index.html</code></td>
+        <td>SPA principal, Firebase SDK, CSP</td>
+    </tr>
+    <tr>
+        <td><code>landing.html</code></td>
+        <td>Landing page pública</td>
+    </tr>
+    <tr>
+        <td><code>js/app.js</code></td>
+        <td>Lógica principal, navegación, utilidades</td>
+    </tr>
+    <tr>
+        <td><code>js/auth.js</code></td>
+        <td>Login, registro, sesión</td>
+    </tr>
+    <tr>
+        <td><code>js/billing.js</code></td>
+        <td>Sistema de planes y pagos</td>
+    </tr>
+    <tr>
+        <td><code>js/patients.js</code></td>
+        <td>CRUD de pacientes</td>
+    </tr>
+    <tr>
+        <td><code>js/appointments.js</code></td>
+        <td>CRUD de turnos</td>
+    </tr>
+    <tr>
+        <td><code>js/admin.js</code></td>
+        <td>Panel de administración</td>
+    </tr>
+    <tr>
+        <td><code>js/profile.js</code></td>
+        <td>Perfil de usuario</td>
+    </tr>
+    <tr>
+        <td><code>js/i18n.js</code></td>
+        <td>Traducciones ES/EN</td>
+    </tr>
+    <tr>
+        <td><code>js/monitor.js</code></td>
+        <td>Monitoreo de errores</td>
+    </tr>
+    <tr>
+        <td><code>sw.js</code></td>
+        <td>Service Worker (caché PWA)</td>
+    </tr>
+    <tr>
+        <td><code>css/styles.css</code></td>
+        <td>Estilos de la app</td>
+    </tr>
+    <tr>
+        <td><code>css/landing.css</code></td>
+        <td>Estilos de la landing</td>
+    </tr>
+</table>
+
+<h2>9. Emergency Checklist</h2>
+
+<div class="danger">
+    <strong>Si la app no funciona:</strong>
+</div>
+
+<ol>
+    <li>☐ ¿GitHub Pages está caído? Verificar en <span class="url">https://www.githubstatus.com/</span></li>
+    <li>☐ ¿Firebase está caído? Verificar en <span class="url">https://status.firebase.google.com/</span></li>
+    <li>☐ ¿Vercel está caído? Verificar en <span class="url">https://www.vercel-status.com/</span></li>
+    <li>☐ ¿Mercado Pago está caído? Verificar en <span class="url">https://status.mercadopago.com/</span></li>
+    <li>☐ ¿El Service Worker tiene caché vieja? Pedir al usuario que limpie caché</li>
+    <li>☐ ¿Hay errores en Firestore > errors?</li>
+    <li>☐ ¿Hay errores en Vercel > Logs?</li>
+</ol>
+
+<div class="warning">
+    <strong>Si los pagos no funcionan:</strong>
+</div>
+
+<ol>
+    <li>☐ Verificar que <code>MP_ACCESS_TOKEN</code> esté en Vercel</li>
+    <li>☐ Verificar que <code>FIREBASE_SERVICE_ACCOUNT</code> esté en Vercel</li>
+    <li>☐ Verificar webhook en Mercado Pago > Webhooks</li>
+    <li>☐ Verificar logs en Vercel > Logs</li>
+    <li>☐ Verificar que el usuario tenga un plan asignado en Firestore</li>
+</ol>
+
+<h2>10. Contactos</h2>
+
+<table>
+    <tr>
+        <th>Servicio</th>
+        <th>Soporte</th>
+    </tr>
+    <tr>
+        <td>Firebase</td>
+        <td><span class="url">https://support.google.com/firebase</span></td>
+    </tr>
+    <tr>
+        <td>Vercel</td>
+        <td><span class="url">https://vercel.com/support</span></td>
+    </tr>
+    <tr>
+        <td>Mercado Pago</td>
+        <td><span class="url">https://www.mercadopago.com.ar/ayuda</span></td>
+    </tr>
+    <tr>
+        <td>GitHub</td>
+        <td><span class="url">https://support.github.com</span></td>
+    </tr>
+</table>
+
+<br>
+<hr>
+<p style="text-align: center; color: #6b7280;">
+    MisTurnos - © 2026 Sebastián Russo<br>
+    Documento generado el 06 de agosto de 2026
+</p>
+
+</body>
+</html>
