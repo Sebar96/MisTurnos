@@ -107,8 +107,6 @@ const App = {
             <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap;">
                 Actualizar
             </button>`;
-                Actualizar
-            </button>`;
         document.body.appendChild(banner);
     },
 
