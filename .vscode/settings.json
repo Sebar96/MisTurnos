@@ -1,0 +1,8 @@
+{
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "js/ts.implicitProjectConfig.checkJs": false,
+  "files.associations": {
+    "*.js": "javascript"
+  }
+}

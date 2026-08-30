@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * MisTurnos - © 2026 Sebastián Russo
  * Todos los derechos reservados.

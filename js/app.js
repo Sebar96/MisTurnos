@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * MisTurnos - © 2026 Sebastián Russo
  * Todos los derechos reservados.
@@ -45,7 +46,7 @@ const App = {
     init() {
         console.log('[App] Inicializando MisTurnos...');
         const versionEl = document.getElementById('appVersion');
-        if (versionEl) versionEl.textContent = this.APP_VERSION;
+        if (versionEl) versionEl.textContent = 'v' + this.APP_VERSION;
         this.registerServiceWorker();
         this.loadTheme();
         Auth.checkSession();
@@ -104,8 +105,6 @@ const App = {
         banner.innerHTML = `
             <span><i class="bi bi-arrow-up-circle-fill me-2"></i><strong>¡Nueva versión disponible!</strong></span>
             <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap;">
-                Actualizar
-            </button>`;
                 Actualizar
             </button>`;
         document.body.appendChild(banner);
