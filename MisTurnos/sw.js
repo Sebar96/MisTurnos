@@ -3,8 +3,8 @@
  * Estrategia: Cache First para archivos estáticos, Network First para datos
  */
 
-const CACHE_NAME = 'misturnos-v8';
-const CACHE_STATIC = 'misturnos-static-v8';
+const CACHE_NAME = 'misturnos-v9';
+const CACHE_STATIC = 'misturnos-static-v9';
 const CACHE_FONTS = 'misturnos-fonts-v1';
 
 const STATIC_ASSETS = [

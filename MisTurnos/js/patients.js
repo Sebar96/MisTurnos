@@ -314,18 +314,19 @@ const Patients = {
         if (isEditing && patientId) {
             this.getById(patientId).then((p) => {
                 if (p) {
-                    document.getElementById('pName').value = p.name || '';
-                    document.getElementById('pPhone').value = p.phone || '';
-                    document.getElementById('pEmail').value = p.email || '';
-                    document.getElementById('pInsurance').value = p.insurance || '';
-                    document.getElementById('pStatus').value = p.status || 'active';
-                    document.getElementById('pReason').value = p.reason || '';
-                    var elCardiac = document.getElementById('pCardiac'); if (elCardiac) elCardiac.value = p.cardiac || 'no';
-                    var elCardiacDetail = document.getElementById('pCardiacDetail'); if (elCardiacDetail) elCardiacDetail.value = p.cardiacDetail || '';
-                    var elDiseases = document.getElementById('pDiseases'); if (elDiseases) elDiseases.value = p.diseases || '';
-                    var elAllergies = document.getElementById('pAllergies'); if (elAllergies) elAllergies.value = p.allergies || '';
-                    var elMedication = document.getElementById('pMedication'); if (elMedication) elMedication.value = p.medication || '';
-                    document.getElementById('pObservations').value = p.observations || '';
+                    var _set = function(id, val) { var el = document.getElementById(id); if (el) el.value = val; };
+                    _set('pName', p.name || '');
+                    _set('pPhone', p.phone || '');
+                    _set('pEmail', p.email || '');
+                    _set('pInsurance', p.insurance || '');
+                    _set('pStatus', p.status || 'active');
+                    _set('pReason', p.reason || '');
+                    _set('pCardiac', p.cardiac || 'no');
+                    _set('pCardiacDetail', p.cardiacDetail || '');
+                    _set('pDiseases', p.diseases || '');
+                    _set('pAllergies', p.allergies || '');
+                    _set('pMedication', p.medication || '');
+                    _set('pObservations', p.observations || '');
                 }
             });
         }
