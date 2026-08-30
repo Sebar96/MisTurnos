@@ -3,8 +3,8 @@
  * Estrategia: Cache First para archivos estáticos, Network First para datos
  */
 
-const CACHE_NAME = 'misturnos-v7';
-const CACHE_STATIC = 'misturnos-static-v7';
+const CACHE_NAME = 'misturnos-v8';
+const CACHE_STATIC = 'misturnos-static-v8';
 const CACHE_FONTS = 'misturnos-fonts-v1';
 
 const STATIC_ASSETS = [
@@ -35,15 +35,15 @@ const FONT_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-    console.log('[SW v7] Instalando...');
+    console.log('[SW v8] Instalando...');
     event.waitUntil(
         Promise.all([
             caches.open(CACHE_STATIC).then((cache) => {
-                console.log('[SW v7] Cacheando archivos estáticos...');
+                console.log('[SW v8] Cacheando archivos estáticos...');
                 return cache.addAll(STATIC_ASSETS);
             }),
             caches.open(CACHE_FONTS).then((cache) => {
-                console.log('[SW v7] Cacheando CDNs y fuentes...');
+                console.log('[SW v8] Cacheando CDNs y fuentes...');
                 return cache.addAll([...CDN_ASSETS, ...FONT_ASSETS]);
             })
         ])
@@ -52,14 +52,14 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('[SW v7] Activando...');
+    console.log('[SW v8] Activando...');
     event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.filter((key) =>
                     key !== CACHE_STATIC && key !== CACHE_FONTS
                 ).map((key) => {
-                    console.log('[SW v7] Eliminando caché viejo:', key);
+                    console.log('[SW v8] Eliminando caché viejo:', key);
                     return caches.delete(key);
                 })
             );
