@@ -46,7 +46,7 @@ const App = {
     init() {
         console.log('[App] Inicializando MisTurnos...');
         const versionEl = document.getElementById('appVersion');
-        if (versionEl) versionEl.textContent = this.APP_VERSION;
+        if (versionEl) versionEl.textContent = 'v' + this.APP_VERSION;
         this.registerServiceWorker();
         this.loadTheme();
         Auth.checkSession();
