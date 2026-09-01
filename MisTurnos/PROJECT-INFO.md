@@ -1,10 +1,13 @@
-# MisTurnos - Referencia del Proyecto
+# MisTurnos - Índice (ver RUNBOOK para detalle)
+
+> **Al retomar:** Copiá `RUNBOOK.md` + último bloque de `CHANGELOG.md`. Este archivo es solo índice.
 
 ## Stack
 - **Frontend**: HTML + Bootstrap 5 + JavaScript vanilla (PWA)
 - **Backend**: Firebase (Auth + Firestore + Hosting)
 - **Pagos**: Mercado Pago via API en Vercel
 - **API**: https://mis-turnos-api.vercel.app
+- **Docs completas:** `RUNBOOK.md:1` y `CHANGELOG.md:1`
 
 ## Estructura de archivos
 ```
