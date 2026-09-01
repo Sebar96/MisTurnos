@@ -71,7 +71,7 @@ const App = {
         console.log('[App] MisTurnos listo.');
     },
 
-    APP_VERSION: '2.1.1',
+    APP_VERSION: '2.1.2',
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {

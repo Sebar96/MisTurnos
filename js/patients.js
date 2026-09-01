@@ -334,6 +334,8 @@ const Patients = {
 
     async saveFromForm(event, patientId) {
         event.preventDefault();
+        const submitBtn = event.target.querySelector('[type="submit"]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...'; }
 
         const { doc, setDoc, addDoc, collection } = window.firebaseExports;
         const db = window.firebaseDB;
@@ -360,10 +362,19 @@ const Patients = {
         }
 
         if (!patientId) {
-            const canAdd = await Billing.canAddPatient(uid);
-            if (!canAdd) {
-                Billing.showUpgradeModal('limit_reached');
-                return;
+            try {
+                const canAdd = await Promise.race([
+                    Billing.canAddPatient(uid),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout canAddPatient')), 8000))
+                ]);
+                if (!canAdd) {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Crear Paciente'; }
+                    Billing.showUpgradeModal('limit_reached');
+                    return;
+                }
+            } catch (e) {
+                console.warn('[Patients] canAddPatient timeout/error, permitiendo guardar:', e);
+                if (typeof Monitor !== 'undefined') Monitor.logError('canAddPatient timeout', e.message || String(e), { uid });
             }
         }
 
@@ -384,11 +395,16 @@ const Patients = {
                 App.showToast('Paciente creado correctamente', 'success');
             }
 
-            bootstrap.Modal.getInstance(document.getElementById('appModal')).hide();
+            const modalEl = document.getElementById('appModal');
+            const modalInst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modalInst.hide();
             this.render();
         } catch (err) {
             console.error('[Patients] Error saving:', err);
-            App.showToast('Error al guardar el paciente', 'danger');
+            if (typeof Monitor !== 'undefined') Monitor.logError('saveFromForm', err.message || String(err), { patientId });
+            App.showToast('Error al guardar el paciente: ' + (err.message || ''), 'danger');
+        } finally {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = patientId ? '<i class="bi bi-check-circle me-2"></i>Guardar Cambios' : '<i class="bi bi-check-circle me-2"></i>Crear Paciente'; }
         }
     },
 
