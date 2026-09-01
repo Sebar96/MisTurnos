@@ -3,8 +3,8 @@
  * Estrategia: Cache First para archivos estáticos, Network First para datos
  */
 
-const CACHE_NAME = 'misturnos-v10';
-const CACHE_STATIC = 'misturnos-static-v10';
+const CACHE_NAME = 'misturnos-v11';
+const CACHE_STATIC = 'misturnos-static-v11';
 const CACHE_FONTS = 'misturnos-fonts-v1';
 
 const STATIC_ASSETS = [
@@ -35,15 +35,15 @@ const FONT_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-    console.log('[SW v8] Instalando...');
+    console.log('[SW v11] Instalando...');
     event.waitUntil(
         Promise.all([
             caches.open(CACHE_STATIC).then((cache) => {
-                console.log('[SW v8] Cacheando archivos estáticos...');
+                console.log('[SW v11] Cacheando archivos estáticos...');
                 return cache.addAll(STATIC_ASSETS);
             }),
             caches.open(CACHE_FONTS).then((cache) => {
-                console.log('[SW v8] Cacheando CDNs y fuentes...');
+                console.log('[SW v11] Cacheando CDNs y fuentes...');
                 return cache.addAll([...CDN_ASSETS, ...FONT_ASSETS]);
             })
         ])
@@ -52,14 +52,14 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('[SW v8] Activando...');
+    console.log('[SW v11] Activando...');
     event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.filter((key) =>
                     key !== CACHE_STATIC && key !== CACHE_FONTS
                 ).map((key) => {
-                    console.log('[SW v8] Eliminando caché viejo:', key);
+                    console.log('[SW v11] Eliminando caché viejo:', key);
                     return caches.delete(key);
                 })
             );
@@ -74,6 +74,12 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     if (url.pathname.startsWith('/users/') || url.pathname.includes('firestore')) {
+        event.respondWith(networkFirst(event.request));
+        return;
+    }
+
+    // Navegaciones (index.html) -> networkFirst para que la actualización llegue sin borrar caché manual
+    if (event.request.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/')) {
         event.respondWith(networkFirst(event.request));
         return;
     }
