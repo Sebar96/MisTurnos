@@ -35,7 +35,8 @@ gh-pages -d .                    # Solo si cliente usa GH Pages (Barbara iOS)
 Hard reload cliente: `Ctrl+Shift+R` desktop / `Ajustes > Safari > Borrar historial` iOS.
 
 ## 5. Versionado
-`js/app.js:74` `APP_VERSION: '2.1.1'` + `sw.js:6` `CACHE_NAME='misturnos-v9'` + `index.html:756` footer `<span id="appVersion">v2.1.1</span>`. Ver en footer + consola `[App] Inicializando MisTurnos...` `js/app.js:46`.
+`js/app.js:74` `APP_VERSION: '2.1.5'` + `sw.js:6` `CACHE_NAME='misturnos-v13'` + `index.html:756` footer `<span id="appVersion">v2.1.5</span>`. Ver en footer + consola `[App] Inicializando MisTurnos...` `js/app.js:46`.
+Histórico: ver `CHANGELOG.md:1`.
 
 ## 6. Cómo reportar error (plantilla 5 líneas)
 ```
@@ -64,3 +65,11 @@ git revert HEAD --no-edit; git push; firebase deploy --only hosting; gh-pages -d
 
 ## 10. Qué NO tocar en Plan A
 No mover `.git` de `AppAgenda` a `MisTurnos` (Plan B). No crear GitHub Action automática aún.
+
+## 11. Auto-actualización PWA (v2.1.3+)
+`sw.js:71` `networkFirst` para `index.html` + `js/app.js:78` `register('./sw.js?v=2.1.5', {updateViaCache:'none'})` + `js/app.js:94` `controllerchange` reload + banner auto 3s `js/app.js:99`. Usuario no técnico solo cierra y abre la PWA.
+
+## 12. Fixes recientes clave (para copiar al volver)
+- 30/08 v2.1.2 `js/patients.js:335` anti-cuelgue `canAddPatient:362` `Promise.race 8s` + spinner `js/patients.js:336` + modal safe `387`.
+- 30/08 v2.1.5 `js/patients.js:38` `getAll` timeout 6s evita skeleton eterno (tu screenshot 19:46).
+- GH Pages `Source: Deploy from a branch: gh-pages` (ya cambiado, antes fallaba `Actions` runner).
