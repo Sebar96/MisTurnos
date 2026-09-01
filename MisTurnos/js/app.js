@@ -71,11 +71,11 @@ const App = {
         console.log('[App] MisTurnos listo.');
     },
 
-    APP_VERSION: '2.1.3',
+    APP_VERSION: '2.1.4',
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then((reg) => {
+            navigator.serviceWorker.register('./sw.js?v=2.1.3', { updateViaCache: 'none' }).then((reg) => {
                 console.log('[App] Service Worker registrado:', reg.scope);
 
                 // Detectar actualizaciones
