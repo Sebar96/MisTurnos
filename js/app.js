@@ -71,7 +71,7 @@ const App = {
         console.log('[App] MisTurnos listo.');
     },
 
-    APP_VERSION: '2.1.2',
+    APP_VERSION: '2.1.3',
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
@@ -90,9 +90,15 @@ const App = {
                     });
                 });
 
-                // Check periódico cada 5 minutos
-                setInterval(() => { reg.update(); }, 5 * 60 * 1000);
+                // Check periódico cada 60s + uno a los 3s para usuarios no técnicos
+                setTimeout(() => reg.update(), 3000);
+                setInterval(() => { reg.update(); }, 60 * 1000);
+                // Si el SW cambia, el updatefound arriba dispara el banner
             }).catch((err) => console.warn('[App] Error al registrar SW:', err));
+            // Detectar cuando el nuevo SW toma el control -> recargar automático
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!window._reloading) { window._reloading = true; window.location.reload(); }
+            });
         }
     },
 
@@ -103,15 +109,20 @@ const App = {
         banner.id = 'updateBanner';
         banner.style.cssText = 'position:fixed;bottom:20px;left:20px;right:20px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;padding:16px 20px;z-index:9999;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:space-between;animation:slideUp 0.3s ease;';
         banner.innerHTML = `
-            <span><i class="bi bi-arrow-up-circle-fill me-2"></i><strong>¡Nueva versión disponible!</strong></span>
+            <span><i class="bi bi-arrow-up-circle-fill me-2"></i><strong>¡Nueva versión disponible!</strong> Se actualizará sola en 3s</span>
             <button onclick="App.applyUpdate()" style="background:white;color:#4f46e5;border:none;padding:8px 20px;border-radius:8px;font-weight:700;cursor:pointer;white-space:nowrap;">
-                Actualizar
+                Actualizar ahora
             </button>`;
         document.body.appendChild(banner);
+        // Auto-actualización sin que toque nada - ideal para usuarios no técnicos
+        setTimeout(() => this.applyUpdate(), 3000);
     },
 
     applyUpdate() {
-        window.location.reload();
+        if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+        }
+        setTimeout(() => window.location.reload(), 500);
     },
 
     // ===================== SEGURIDAD =====================
