@@ -35,12 +35,17 @@ const Patients = {
         const db = window.firebaseDB;
 
         try {
-            const snapshot = await getDocs(collection(db, 'users', uid, 'patients'));
+            const snapshot = await Promise.race([
+                getDocs(collection(db, 'users', uid, 'patients')),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout getAll')), 6000))
+            ]);
             const patients = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
             Cache.set(`patients_${uid}`, patients);
             return patients;
         } catch (err) {
             console.error('[Patients] Error getting patients:', err);
+            if (cached) return cached;
+            if (err.message === 'timeout getAll' && typeof Monitor !== 'undefined') Monitor.logError('patients.getAll timeout', 'Firestore 6s', { uid });
             return [];
         }
     },
