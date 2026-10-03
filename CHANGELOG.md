@@ -1,5 +1,25 @@
 # CHANGELOG — MisTurnos
 
+## v2.1.6 - 2026-10-01 - sw v14
+- feat: tour guiado con spotlight `js/tour.js` (12 pasos, resalta elemento real + tarjeta) reemplaza al onboarding de 4 slides `js/app.js:662`.
+- feat: auto-al-registrarse (`App.checkOnboarding` → `Tour.start()`) + ítem "Ver Tutorial" en menú usuario (`index.html:94`, i18n `nav.tutorial`).
+- feat: `css/styles.css` estilos `.tour-*` (tema claro/oscuro, bottom-sheet <768px) + `index.html:19` `styles.css?v=2` para bustear caché.
+- chore: `sw.js:6` `CACHE_NAME/CACHE_STATIC v14` + `./js/tour.js` en `STATIC_ASSETS`; `js/app.js:74` `APP_VERSION 2.1.6` + footer `index.html:756` + `sw.js?v=2.1.6`.
+
+## v2.1.5 - 2026-08-30 - sw v13
+- perf: `js/patients.js:38` `getAll` `Promise.race 6s` evita skeletons eternos en móvil (reporte 19:46).
+- feat: `js/app.js:78` `sw.js?v` + `firebase.json:14` `sw.js no-cache` fuerza actualización sin borrar caché.
+
+## v2.1.4 - 2026-08-30 - sw v12
+- fix: `js/app.js:78` `updateViaCache:'none'` + `firebase.json:14` `sw.js no-cache` para PWA instalada en GH Pages (`sebar96.github.io/MisTurnos`).
+
+## v2.1.3 - 2026-08-30 - sw v11
+- feat: auto-update transparente `sw.js:71` `networkFirst` index + `js/app.js:94` `controllerchange` + banner 3s `js/app.js:99`.
+- fix: GH Pages `Source: gh-pages branch` (antes `Actions` fallaba `Páginas-Construcción`).
+
+## v2.1.2 - 2026-08-30 - sw v10
+- fix: anti-cuelgue `js/patients.js:335` `canAddPatient` timeout 8s + spinner + `js/patients.js:387` modal safe `getInstance || new Modal`.
+
 ## v2.1.1 - 2026-08-30 - sw v9
 - fix: `js/patients.js:316` null-check total en prefill (`_set` helper) corrige `Cannot set properties of null (setting 'value')` 30/08 12:44.
 - feat: PWA `manifest.json:5-6` `start_url/scope "./"` para Firebase `cleanUrls:true` `firebase.json:35`.

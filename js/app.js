@@ -71,11 +71,11 @@ const App = {
         console.log('[App] MisTurnos listo.');
     },
 
-    APP_VERSION: '2.1.5',
+    APP_VERSION: '2.1.6',
 
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=2.1.3', { updateViaCache: 'none' }).then((reg) => {
+            navigator.serviceWorker.register('./sw.js?v=2.1.6', { updateViaCache: 'none' }).then((reg) => {
                 console.log('[App] Service Worker registrado:', reg.scope);
 
                 // Detectar actualizaciones
@@ -657,92 +657,9 @@ const App = {
         });
     },
 
-    _onboardingStep: 0,
-
     showOnboarding() {
-        this._onboardingStep = 0;
-        this.renderOnboardingStep();
-    },
-
-    renderOnboardingStep() {
-        const steps = [
-            {
-                icon: 'bi-calendar-check',
-                title: 'Bienvenido a MisTurnos',
-                text: 'Tu app para gestionar turnos de forma simple y rápida. Te vamos a mostrar cómo funciona.'
-            },
-            {
-                icon: 'bi-people',
-                title: 'Gestioná tus Pacientes',
-                text: 'Creá fichas con datos de contacto e información del paciente. Todo centralizado.'
-            },
-            {
-                icon: 'bi-calendar-event',
-                title: 'Organizá tu Agenda',
-                text: 'Creá turnos, confirmalos, reprogramalos. Recibí notificaciones y enviá recordatorios por WhatsApp.'
-            },
-            {
-                icon: 'bi-rocket-takeoff',
-                title: '¡Listo para empezar!',
-                text: 'Ya podés comenzar a usar MisTurnos. Creá tu primer paciente o turno desde el panel principal.'
-            }
-        ];
-
-        const step = steps[this._onboardingStep];
-        const isLast = this._onboardingStep === steps.length - 1;
-
-        let overlay = document.getElementById('onboardingOverlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'onboardingOverlay';
-            overlay.className = 'onboarding-overlay';
-            document.body.appendChild(overlay);
-        }
-
-        overlay.innerHTML = `
-            <div class="onboarding-card">
-                <div class="onboarding-step-icon">
-                    <i class="bi ${step.icon}"></i>
-                </div>
-                <div class="onboarding-title">${step.title}</div>
-                <div class="onboarding-text">${step.text}</div>
-                <div class="onboarding-dots">
-                    ${steps.map((_, i) => `<div class="onboarding-dot ${i === this._onboardingStep ? 'active' : ''}"></div>`).join('')}
-                </div>
-                <div class="onboarding-actions">
-                    <button class="btn btn-outline-secondary" onclick="App.skipOnboarding()">Saltar</button>
-                    <button class="btn btn-primary" onclick="App.nextOnboardingStep()">
-                        ${isLast ? '¡Empezar!' : 'Siguiente'}
-                    </button>
-                </div>
-            </div>`;
-    },
-
-    nextOnboardingStep() {
-        this._onboardingStep++;
-        if (this._onboardingStep >= 4) {
-            this.completeOnboarding();
-        } else {
-            this.renderOnboardingStep();
-        }
-    },
-
-    skipOnboarding() {
-        this.completeOnboarding();
-    },
-
-    completeOnboarding() {
-        const overlay = document.getElementById('onboardingOverlay');
-        if (overlay) overlay.remove();
-
-        const uid = Auth.getUid();
-        if (uid) {
-            localStorage.setItem('misturnos_onboarded_' + uid, '1');
-
-            const { doc, setDoc } = window.firebaseExports;
-            const db = window.firebaseDB;
-            setDoc(doc(db, 'users', uid), { onboardingDone: true }, { merge: true });
-        }
+        // Tour guiado con spotlight (js/tour.js). Reemplaza al onboarding de slides.
+        if (typeof Tour !== 'undefined') Tour.start();
     },
 
     showReportErrorModal() {
