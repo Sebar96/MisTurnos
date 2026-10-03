@@ -666,87 +666,139 @@ html[data-bs-theme="dark"] .btn-google:hover {
     background: #3c3c3c;
 }
 
-/* ===================== ONBOARDING ===================== */
-.onboarding-overlay {
+/* ===================== TOUR GUIADO (spotlight) ===================== */
+.tour-root {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 1070;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease;
-    padding: 1rem;
+    inset: 0;
+    z-index: 1080;
 }
 
-.onboarding-card {
+/* Capa transparente que bloquea clicks fuera de la tarjeta */
+.tour-backdrop {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    transition: background 0.25s ease;
+}
+
+/* Pasos sin elemento (tarjeta centrada): oscurecer todo el fondo */
+.tour-root.tour-root-centered .tour-backdrop {
+    background: rgba(0, 0, 0, 0.68);
+}
+
+.tour-spotlight {
+    position: fixed;
+    border-radius: var(--radius-md, 12px);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.68);
+    border: 2px solid var(--primary);
+    pointer-events: none;
+    transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease;
+    z-index: 1081;
+}
+
+.tour-card {
+    position: fixed;
+    z-index: 1082;
     background: var(--bg-card);
-    border-radius: var(--radius-md);
-    padding: 2.5rem;
-    max-width: 460px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
+    padding: 1.25rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    width: 340px;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    animation: fadeIn 0.25s ease;
+}
+
+.tour-card-centered {
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%);
     text-align: center;
 }
 
-.onboarding-step-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: inline-flex;
+.tour-card-top {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 2.2rem;
-    margin-bottom: 1.25rem;
-    background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-    color: #fff;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
 }
 
-.onboarding-title {
+.tour-badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
     font-weight: 700;
-    font-size: 1.3rem;
-    margin-bottom: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.tour-title {
+    font-weight: 700;
+    font-size: 1.05rem;
     color: var(--text-primary);
 }
 
-.onboarding-text {
+.tour-text {
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
 }
 
-.onboarding-dots {
+.tour-dots {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 1.5rem;
+    gap: 6px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
-.onboarding-dot {
-    width: 10px;
-    height: 10px;
+.tour-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--border-color);
     transition: var(--transition);
 }
 
-.onboarding-dot.active {
+.tour-dot.active {
     background: var(--primary);
-    width: 28px;
-    border-radius: 5px;
+    width: 22px;
+    border-radius: 4px;
 }
 
-.onboarding-actions {
+.tour-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.tour-card-centered .tour-actions {
     justify-content: center;
 }
 
-.onboarding-actions .btn {
-    min-width: 130px;
+/* Móvil: tarjeta como bottom-sheet (posición la maneja JS) */
+@media (max-width: 767.98px) {
+    .tour-card {
+        width: auto;
+        right: 12px;
+    }
+
+    .tour-card-centered {
+        top: auto !important;
+        bottom: 12px !important;
+        left: 12px !important;
+        right: 12px !important;
+        transform: none;
+        width: auto;
+    }
 }
 
 /* ===================== PATIENT DETAIL ===================== */

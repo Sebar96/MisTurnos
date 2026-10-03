@@ -23,6 +23,7 @@ const I18n = {
             'nav.export': 'Exportar Datos',
             'nav.import': 'Importar Datos',
             'nav.reportErrors': 'Reportar Errores',
+            'nav.tutorial': 'Ver Tutorial',
             'nav.logout': 'Cerrar Sesión',
 
             // Login
@@ -194,6 +195,7 @@ const I18n = {
             'nav.export': 'Export Data',
             'nav.import': 'Import Data',
             'nav.reportErrors': 'Report Errors',
+            'nav.tutorial': 'View Tutorial',
             'nav.logout': 'Log Out',
 
             // Login

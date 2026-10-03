@@ -1,5 +1,11 @@
 # CHANGELOG — MisTurnos
 
+## v2.1.6 - 2026-10-01 - sw v14
+- feat: tour guiado con spotlight `js/tour.js` (12 pasos, resalta elemento real + tarjeta) reemplaza al onboarding de 4 slides `js/app.js:662`.
+- feat: auto-al-registrarse (`App.checkOnboarding` → `Tour.start()`) + ítem "Ver Tutorial" en menú usuario (`index.html:94`, i18n `nav.tutorial`).
+- feat: `css/styles.css` estilos `.tour-*` (tema claro/oscuro, bottom-sheet <768px) + `index.html:19` `styles.css?v=2` para bustear caché.
+- chore: `sw.js:6` `CACHE_NAME/CACHE_STATIC v14` + `./js/tour.js` en `STATIC_ASSETS`; `js/app.js:74` `APP_VERSION 2.1.6` + footer `index.html:756` + `sw.js?v=2.1.6`.
+
 ## v2.1.5 - 2026-08-30 - sw v13
 - perf: `js/patients.js:38` `getAll` `Promise.race 6s` evita skeletons eternos en móvil (reporte 19:46).
 - feat: `js/app.js:78` `sw.js?v` + `firebase.json:14` `sw.js no-cache` fuerza actualización sin borrar caché.
